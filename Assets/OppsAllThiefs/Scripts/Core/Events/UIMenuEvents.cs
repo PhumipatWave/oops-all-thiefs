@@ -1,16 +1,15 @@
+using System;
 using UnityEngine;
 
-public class UIMenuEvents : MonoBehaviour
+public static class UIMenuEvents
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    // Declare events
+    public static event Action OnGameInitialized;
+    public static event Action OnClickPlayed;
+    public static event Action OnClickExited;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // Use for Invoke the events
+    public static void RaiseGameInitialized() => OnGameInitialized?.Invoke();
+    public static void RaiseClickPlayed() => OnClickPlayed?.Invoke();
+    public static void RaiseClickExited() => OnClickExited?.Invoke();
 }

@@ -1,16 +1,12 @@
 using UnityEngine;
 
-public class CharacterBaseStat : MonoBehaviour
+[CreateAssetMenu(fileName = "CharacterBaseStat", menuName = "ScriptableObects/CharacterBaseStat")]
+public class CharacterBaseStat : ScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public int MaxHealth;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public int MinMoveSpeed;
+    public int MaxMoveSpeed;
+
+    public int MaxMoney;
 }

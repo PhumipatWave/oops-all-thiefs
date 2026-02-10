@@ -1,16 +1,15 @@
+using System;
 using UnityEngine;
 
-public class CharacterEvents : MonoBehaviour
+public static class CharacterEvents
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    // Declare events
+    public static event Action<int> OnHealthChanged;
+    public static event Action<Vector2> OnMoved;
+    public static event Action OnAttacked;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // Use for Invoke the events
+    public static void RaiseHealthChanged(int amount) => OnHealthChanged?.Invoke(amount);
+    public static void RaiseMoved(Vector2 direction) => OnMoved?.Invoke(direction);
+    public static void RaiseAttacked() => OnAttacked?.Invoke();
 }

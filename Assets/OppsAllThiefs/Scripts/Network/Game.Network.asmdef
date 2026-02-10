@@ -1,7 +1,10 @@
 {
     "name": "Game.Network",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:f1a621bcde79e7e4bbb68bc5c15b69ca",
+        "GUID:1491147abca9d7d4bb7105af628b223e"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
