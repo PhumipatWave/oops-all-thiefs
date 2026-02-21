@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.Events;
 
-public class Item
+
+public class Item : MonoBehaviour
 {
-    
+   
 }
