@@ -3,8 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
 
-
-public class TestMoneyUI : CharacterStatHandle
+public class TestMoneyUI : MonoBehaviour
 {
     public TextMeshProUGUI moneyText;
     private int money = 0;

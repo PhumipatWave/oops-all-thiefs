@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class TestHealthUI : CharacterStatHandle
+public class TestHealthUI : MonoBehaviour
 {
     
     [Header("UI_Health")]
