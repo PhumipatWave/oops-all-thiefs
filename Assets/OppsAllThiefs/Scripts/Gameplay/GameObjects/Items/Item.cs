@@ -1,6 +1,7 @@
 using UnityEngine;
+using TMPro; 
 
-public class Item
+public class Item : MonoBehaviour
 {
-    
+    [SerializeField] private ItemBaseStat itemStat;
 }

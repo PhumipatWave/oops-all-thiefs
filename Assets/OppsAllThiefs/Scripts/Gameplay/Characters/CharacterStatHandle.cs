@@ -1,29 +1,9 @@
 using UnityEngine;
 
-public class CharacterStatHandle
+public class CharacterStatHandle 
 {
-    public CharacterStatHandle()
-    {
+    public CharacterBaseStat charStat;
 
-    }
-
-    public void IncreaseHealth(int amount)
-    {
-
-    }
-
-    public void DecreaseHealth(int amount)
-    {
-
-    }
-
-    public void IncreaseMoney(int amount)
-    {
-
-    }
-
-    public void DecreaseMoney(int amount)
-    {
-
-    }
+    public int ModifyStat(int curHealth, int maxStat, int amount)
+        => Mathf.Clamp(curHealth + amount, 0, maxStat);
 }

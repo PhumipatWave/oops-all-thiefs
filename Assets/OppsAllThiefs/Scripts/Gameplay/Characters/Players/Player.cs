@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class Player : Character
+public class Player : Character 
 {
     private PlayerInputHandle playerInputHandle;
+    
 }
