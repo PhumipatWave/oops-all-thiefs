@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/OppsAllThiefs/Scenes/Bootstrap.unity
+    guid: 688444e1ce346eb41ac3a10625edd221
+  - enabled: 1
+    path: Assets/OppsAllThiefs/Scenes/NetworkBootstrap.unity
+    guid: c928bfa1ca1bed04cbe5ab607809ec46
+  - enabled: 1
+    path: Assets/OppsAllThiefs/Scenes/MenuScene.unity
+    guid: 78e4179b04bd4e445a4d696db91e867e
+  - enabled: 1
     path: Assets/OppsAllThiefs/Scenes/GameplayScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
