@@ -1,4 +1,5 @@
 using Unity.Cinemachine;
+using Unity.Netcode;
 using UnityEngine;
 
 public class Player : Character 
@@ -7,27 +8,30 @@ public class Player : Character
     [SerializeField] private InputReader inputReader;
     [SerializeField] private CinemachineCamera playerCamera;
 
-    [Header("UI")]
-    [SerializeField] private GameObject healthBar;
-
     [Header("Settings")]
     [SerializeField] private int ownerPriority = 15;
 
     public override void OnNetworkSpawn()
     {
-        if (!IsOwner) return;
+        // Initialize character stat handle
+        characterStatHandle = new();
 
-        base.OnNetworkSpawn();
+        rb = GetComponent<Rigidbody>();
+        //anim = GetComponent<Animator>();
 
-        healthBar.SetActive(false);
+        if (IsOwner)
+        {
+            inputReader.OnMoved += Move;
+            //inputReader.OnSprinted += Move;
+            inputReader.OnJumped += Jump;
+            inputReader.OnInteracted += Interact;
+            inputReader.OnAttacked += Attack;
 
-        inputReader.OnMoved += Move;
-        //inputReader.OnSprinted += Move;
-        inputReader.OnJumped += Jump;
-        inputReader.OnInteracted += Interact;
-        inputReader.OnAttacked += Attack;
+            playerCamera.Priority = ownerPriority;
+        }
 
-        playerCamera.Priority = ownerPriority;
+        if (IsServer)
+            CurrentHealth.Value = MaxHealth;
 
         Debug.Log("Player network spawned");
     }
@@ -41,11 +45,41 @@ public class Player : Character
         inputReader.OnAttacked -= Attack;
     }
 
+    // Test health
+    private void Update()
+    {
+        if (!IsOwner) return;
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            Heal(10);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            TakeDamage(25);
+        }
+    }
+
     private void FixedUpdate()
     {
         if (!IsOwner) return;
 
         Debug.Log("Player FixedUpdate");
         HandleMove();
+        MoveRotator();
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out Item item))
+        {
+            int collectedValue = item.Collect();
+
+            if (IsServer)
+            {
+                CurrentMoney.Value += collectedValue;
+            }
+        }
     }
 }

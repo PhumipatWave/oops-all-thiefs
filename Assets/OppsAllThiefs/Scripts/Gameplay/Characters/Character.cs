@@ -1,5 +1,7 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHealthable
 {
@@ -8,28 +10,21 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator anim;
+    public event Action OnDeath;
 
     protected Vector3 previousMovementInput;
 
-    protected int currentHealth => charStat.MaxHealth;
+    public NetworkVariable<int> CurrentHealth = new NetworkVariable<int>();
+    public NetworkVariable<int> CurrentMoney = new NetworkVariable<int>();
+
+    public int MaxHealth => charStat.MaxHealth;
+
     protected int currentMoveSpeed => charStat.MinMoveSpeed;
     protected int currentJumpForce => charStat.JumpForce;
 
-    protected int currentRotateSpeed;
-    protected int currentMoney;
+    protected int currentRotateSpeed = 5;
 
     protected bool isGrounded;
-
-    public override void OnNetworkSpawn()
-    {
-        characterStatHandle = new();
-
-        rb = GetComponent<Rigidbody>();
-        //anim = GetComponent<Animator>();
-
-        Debug.Log("Character network spawn");
-        Debug.Log($"Cur speed : {currentMoveSpeed}, Max speed : {charStat.MaxMoveSpeed}");
-    }
 
     public void Move(Vector2 dir)
     {
@@ -45,11 +40,25 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         Debug.Log($"Player move {moveDir}");
     }
 
-    public void MoveRotator(Vector2 dir, Transform transform)
+    /// <summary>
+    /// Rotate the player to the movement direction.
+    /// </summary>
+    public void MoveRotator()
     {
-        if (dir == Vector2.zero) return;
-        Quaternion targetRotation = Quaternion.LookRotation(dir);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, currentRotateSpeed * Time.deltaTime);
+        Vector3 moveDir = transform.forward * previousMovementInput.y
+            + transform.right * previousMovementInput.x;
+
+        if (moveDir.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(moveDir);
+            Quaternion smoothRotation = Quaternion.Slerp(
+                rb.rotation,
+                targetRotation,
+                currentRotateSpeed * Time.fixedDeltaTime
+            );
+
+            rb.MoveRotation(smoothRotation);
+        }
     }
 
     public void Jump()
@@ -73,18 +82,38 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         Debug.Log("Player attack");
     }
 
-    public void Heal()
+    public void Heal(int amount)
     {
-        throw new System.NotImplementedException();
+        //CurrentHealth.Value = characterStatHandle.ModifyStat(CurrentHealth.Value, charStat.MaxHealth, amount);
+
+        ModifyStatServerRpc(amount);
     }
 
-    public void TakeDamage()
+    public void TakeDamage(int amount)
     {
-        throw new System.NotImplementedException();
+        //CurrentHealth.Value = characterStatHandle.ModifyStat(CurrentHealth.Value, charStat.MaxHealth, -amount);
+
+        ModifyStatServerRpc(-amount);
+    }
+
+    // Test Modify
+    [ServerRpc]
+    public void ModifyStatServerRpc(int amount)
+    {
+        if (CurrentHealth.Value <= 0) return;
+
+        int newHealth = CurrentHealth.Value + amount;
+        CurrentHealth.Value = Mathf.Clamp(newHealth, 0, MaxHealth);
+        Debug.Log($"Player health modify : {CurrentHealth.Value}");
+
+        if (CurrentHealth.Value <= 0)
+        {
+            Death();
+        }
     }
 
     public void Death()
     {
-        throw new System.NotImplementedException();
+        OnDeath?.Invoke();
     }
 }

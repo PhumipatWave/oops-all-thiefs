@@ -1,5 +1,53 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3624743111558942604
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4668067072096871768}
+  - component: {fileID: 86945297838694334}
+  m_Layer: 0
+  m_Name: PlayerUIController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4668067072096871768
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3624743111558942604}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6958843482083746126}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &86945297838694334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3624743111558942604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 890774b6b512e574199aaf299a771491, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.UI::PlayerUIControl
+  ShowTopMostFoldoutHeaderGroup: 1
+  player: {fileID: 196166251579268405}
+  healthBarObject: {fileID: 9056879001935228714}
+  healthBarImage: {fileID: 5351614749621156030}
 --- !u!1 &4852851486128269556
 GameObject:
   m_ObjectHideFlags: 0
@@ -186,11 +234,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -308,6 +356,7 @@ Transform:
   - {fileID: 6508264232733218871}
   - {fileID: 5631025806902925345}
   - {fileID: 9098525976963538773}
+  - {fileID: 4668067072096871768}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &1749477871280793805
@@ -372,7 +421,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3141277024
+  GlobalObjectIdHash: 4039451704
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -447,9 +496,10 @@ MonoBehaviour:
   charStat: {fileID: 11400000, guid: 1ef02f392a0037c44a3f4885e5d11d2c, type: 2}
   rb: {fileID: 0}
   anim: {fileID: 0}
+  CurrentHealth:
+    m_InternalValue: 0
   inputReader: {fileID: 11400000, guid: 8a28bf6a16a2bb8489db03a9e1fc5178, type: 2}
   playerCamera: {fileID: 79710204163217821}
-  healthBar: {fileID: 9056879001935228714}
   ownerPriority: 15
 --- !u!1 &9056879001935228714
 GameObject:

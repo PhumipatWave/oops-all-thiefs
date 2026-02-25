@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: V_Money
   m_EditorClassIdentifier: Game.Core::ValueItemBaseStat
   ItemName: Money
-  ItemPrefab: {fileID: 0}
+  ItemPrefab: {fileID: 2464988732922791742, guid: 0bb3763a445b5de4eb87236307133810, type: 3}
   MoneyValue: 10
