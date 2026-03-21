@@ -8,6 +8,8 @@ public class CharacterBaseStat : ScriptableObject
     public int MinMoveSpeed;
     public int MaxMoveSpeed;
 
+    public int MaxRotateSpeed;
+
     public int JumpForce;
 
     public int MaxMoney;

@@ -5,24 +5,25 @@ using UnityEngine.EventSystems;
 
 public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHealthable
 {
+    [Header("Character Status")]
     [SerializeField] protected CharacterBaseStat charStat;
     protected CharacterStatHandle characterStatHandle;
 
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator anim;
-    public event Action OnDeath;
 
     protected Vector3 previousMovementInput;
 
     public NetworkVariable<int> CurrentHealth = new NetworkVariable<int>();
     public NetworkVariable<int> CurrentMoney = new NetworkVariable<int>();
 
+    public event Action OnDeath;
+
     public int MaxHealth => charStat.MaxHealth;
 
     protected int currentMoveSpeed => charStat.MinMoveSpeed;
     protected int currentJumpForce => charStat.JumpForce;
-
-    protected int currentRotateSpeed = 5;
+    protected int currentRotateSpeed => charStat.MaxRotateSpeed;
 
     protected bool isGrounded;
 
@@ -35,7 +36,7 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     {
         Vector3 moveDir = transform.forward * previousMovementInput.y
             + transform.right * previousMovementInput.x;
-        rb.linearVelocity = moveDir * currentMoveSpeed;
+        rb.linearVelocity = new Vector3(moveDir.x * currentMoveSpeed, rb.linearVelocity.y, moveDir.z * currentMoveSpeed);
 
         Debug.Log($"Player move {moveDir}");
     }
