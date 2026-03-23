@@ -2,8 +2,8 @@
     "name": "Game.Application",
     "rootNamespace": "",
     "references": [
-        "Game.Network",
-        "Unity.Netcode.Runtime"
+        "Unity.Netcode.Runtime",
+        "Game.Gameplay"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

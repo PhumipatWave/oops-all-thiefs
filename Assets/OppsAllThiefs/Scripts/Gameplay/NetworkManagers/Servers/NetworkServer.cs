@@ -3,6 +3,8 @@ using Unity.Netcode;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Services.Lobbies.Models;
+using Unity.Services.Lobbies;
 
 public class NetworkServer : IDisposable
 {
@@ -13,6 +15,9 @@ public class NetworkServer : IDisposable
 
     private Dictionary<ulong, string> clientIdToAuth = new();
     private Dictionary<string, UserData> authIdToUserData = new();
+
+    private string lobbyID;
+    public string LobbyID { get { return lobbyID; } set { lobbyID = value; } }
 
     public NetworkServer(NetworkManager networkManager, NetworkObject playerPrefab)
     {
@@ -32,10 +37,10 @@ public class NetworkServer : IDisposable
         authIdToUserData[userData.UserAuthId] = userData;
         Debug.Log($"User Name : {userData.UserName}");
 
-        _ = SpawnPlayerDelayed(request.ClientNetworkId);
+        _ = SpawnPlayerDelayed(request.ClientNetworkId, userData.UserAuthId);
 
         response.Approved = true;
-        response.CreatePlayerObject = true;
+        response.CreatePlayerObject = false;
     }
 
     private void OnNetworkReady()
@@ -53,15 +58,20 @@ public class NetworkServer : IDisposable
         }
     }
 
-    private async Task SpawnPlayerDelayed(ulong clientId)
+    private async Task SpawnPlayerDelayed(ulong clientId, string authId)
     {
         await Task.Delay(1000);
 
-        // For Test************************************************************************
-        NetworkObject playerInstance = GameObject.Instantiate(playerPrefab, /*SpawnPoint.GetRandomSpawnPos()*/ Vector3.zero, Quaternion.identity);
-        //*********************************************************************************
+        Lobby lobby = await LobbyService.Instance.GetLobbyAsync(lobbyID);
+        Unity.Services.Lobbies.Models.Player playerLobbyInfo = lobby.Players.Find(p => p.Id == authId);
+
+        int index = lobby.Players.FindIndex(p => p.Id == authId);
+
+        NetworkObject playerInstance = GameObject.Instantiate(playerPrefab, PlayerSpawnPoint.GetSpawnIndexPos(index), Quaternion.Euler(0, 180, 0));
 
         playerInstance.SpawnAsPlayerObject(clientId);
+
+        Debug.Log($"{index} : {playerInstance}");
     }
 
     public UserData GetUserDataByClientId(ulong clientId)

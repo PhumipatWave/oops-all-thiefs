@@ -6,6 +6,7 @@ using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
+using Unity.Services.Lobbies;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
@@ -13,6 +14,7 @@ using UnityEngine.SceneManagement;
 
 public class ClientGameManager : IDisposable
 {
+    PlayerLobbyInfo playerLobbyInfo;
     private JoinAllocation allocation;
     private NetworkClient networkClient;
     private const string MenuSceneName = "MenuScene";
@@ -38,6 +40,25 @@ public class ClientGameManager : IDisposable
 
     public async Task StartClientAsync(string joinCode)
     {
+        string playerName = PlayerPrefs.GetString(UserConstKey.GetPlayerNameKey(), "Unknown");
+        Color playerColor = Color.gray;
+        string playerColorHex = ColorUtility.ToHtmlStringRGB(playerColor);
+        bool playerReady = false;
+
+        playerLobbyInfo = new PlayerLobbyInfo(playerName, playerColorHex, playerReady.ToString());
+
+        try
+        {
+            await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode, new JoinLobbyByCodeOptions
+            {
+                Player = playerLobbyInfo.GetPlayerLobbyData(),
+            });
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+
         try
         {
             allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
@@ -52,14 +73,11 @@ public class ClientGameManager : IDisposable
         RelayServerData relayServerData = allocation.ToRelayServerData("dtls");
         transport.SetRelayServerData(relayServerData);
 
-        // Team Not Finish *************************************************************************
         UserData userData = new UserData
         {
             UserName = PlayerPrefs.GetString(UserConstKey.GetPlayerNameKey(), "Missing Name"),
             UserAuthId = AuthenticationService.Instance.PlayerId,
-            //teamIndex = PlayerPrefs.GetInt(TeamSelector.PlayerTeamKey, 0)
         };
-        //**********************************************************************************
 
         string payload = JsonUtility.ToJson(userData);
         byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);

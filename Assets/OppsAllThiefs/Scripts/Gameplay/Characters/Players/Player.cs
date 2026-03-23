@@ -1,4 +1,6 @@
+using System;
 using Unity.Cinemachine;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -11,6 +13,12 @@ public class Player : Character
     [Header("Settings")]
     [SerializeField] private int ownerPriority = 15;
 
+    public NetworkVariable<FixedString32Bytes> PlayerName = new();
+    public NetworkVariable<int> PlayerIndex = new();
+
+    public static event Action<Player> OnPlayerSpawned;
+    public static event Action<Player> OnPlayerDespawned;
+
     public override void OnNetworkSpawn()
     {
         // Initialize character stat handle
@@ -18,6 +26,17 @@ public class Player : Character
 
         rb = GetComponent<Rigidbody>();
         //anim = GetComponent<Animator>();
+
+        if (IsServer)
+        {
+            UserData userData = HostHandler.Instance.GameManager.NetworkServer.GetUserDataByClientId(OwnerClientId);
+            PlayerName.Value = userData.UserName;
+
+            int playerIndex = GameObject.FindGameObjectsWithTag("Player").Length;
+            PlayerIndex.Value = playerIndex - 1;
+
+            CurrentHealth.Value = MaxHealth;
+        }
 
         if (IsOwner)
         {
@@ -29,9 +48,6 @@ public class Player : Character
 
             playerCam.Priority = ownerPriority;
         }
-
-        if (IsServer)
-            CurrentHealth.Value = MaxHealth;
 
         Debug.Log("Player network spawned");
     }

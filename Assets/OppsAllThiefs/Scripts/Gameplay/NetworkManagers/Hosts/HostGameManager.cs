@@ -16,6 +16,7 @@ using UnityEngine.SceneManagement;
 
 public class HostGameManager : IDisposable
 {
+    private PlayerLobbyInfo playerLobbyInfo;
     private Allocation allocation;
     private NetworkObject playerPrefab;
 
@@ -24,7 +25,7 @@ public class HostGameManager : IDisposable
     public NetworkServer NetworkServer { get; private set; }
 
     private const int MaxConnections = 7;
-    private const string GameSceneName = "GameplayScene";
+    private const string LobbySceneName = "LobbyScene";
     private const string JoinCodeKey = "JoinCode";
 
     public HostGameManager(NetworkObject playerPrefab)
@@ -67,7 +68,16 @@ public class HostGameManager : IDisposable
         try
         {
             CreateLobbyOptions lobbyOptions = new CreateLobbyOptions();
+
+            string playerName = PlayerPrefs.GetString(UserConstKey.GetPlayerNameKey(), "Unknown");
+            Color playerColor = Color.gray;
+            string playerColorHex = ColorUtility.ToHtmlStringRGB(playerColor);
+            bool playerReady = false;
+
+            playerLobbyInfo = new PlayerLobbyInfo(playerName, playerColorHex, playerReady.ToString());
+
             lobbyOptions.IsPrivate = isPrivate;
+            lobbyOptions.Player = playerLobbyInfo.GetPlayerLobbyData();
             lobbyOptions.Data = new Dictionary<string, DataObject>
             {
                 {
@@ -77,8 +87,6 @@ public class HostGameManager : IDisposable
                         )
                 }
             };
-
-            string playerName = PlayerPrefs.GetString(UserConstKey.GetPlayerNameKey(), "Unknown");
 
             // Set lobby options and create the lobby
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(
@@ -96,15 +104,13 @@ public class HostGameManager : IDisposable
         }
 
         NetworkServer = new NetworkServer(NetworkManager.Singleton, playerPrefab);
+        NetworkServer.LobbyID = lobbyId;
 
-        // Team Not Finish *************************************************************************
         UserData userData = new UserData
         {
             UserName = PlayerPrefs.GetString(UserConstKey.GetPlayerNameKey(), "Missing Name"),
             UserAuthId = AuthenticationService.Instance.PlayerId,
-            //teamIndex = PlayerPrefs.GetInt(TeamSelector.PlayerTeamKey, 0)
         };
-        //**********************************************************************************
 
         // Convert the user data to JSON
         string payload = JsonUtility.ToJson(userData);
@@ -114,7 +120,8 @@ public class HostGameManager : IDisposable
         NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
         NetworkManager.Singleton.StartHost();
         NetworkServer.OnClientLeft += HandleClientLeft;
-        NetworkManager.Singleton.SceneManager.LoadScene(GameSceneName, LoadSceneMode.Single);
+
+        NetworkManager.Singleton.SceneManager.LoadScene(LobbySceneName, LoadSceneMode.Single);
     }
 
     /// <summary>
@@ -146,13 +153,14 @@ public class HostGameManager : IDisposable
 
     public async void Shutdown()
     {
-        HostHandler.Instance.StartCoroutine(nameof(HeartbeatLobby));
+        HostHandler.Instance.StopCoroutine(nameof(HeartbeatLobby));
 
         if (!string.IsNullOrEmpty(lobbyId))
         {
             try
             {
                 await LobbyService.Instance.DeleteLobbyAsync(lobbyId);
+                playerLobbyInfo.ClearPlayerLobbyData();
             }
             catch (LobbyServiceException e)
             {
