@@ -546,7 +546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4039451704
+  GlobalObjectIdHash: 3141277024
   InScenePlacedSourceGlobalObjectIdHash: 4039451704
   DeferredDespawnTick: 0
   Ownership: 1
@@ -628,6 +628,7 @@ MonoBehaviour:
   inputReader: {fileID: 11400000, guid: 8a28bf6a16a2bb8489db03a9e1fc5178, type: 2}
   playerCam: {fileID: 1623077424568131081}
   ownerPriority: 15
+  playerId: 
   PlayerName:
     m_InternalValue:
       utf8LengthInBytes: 0

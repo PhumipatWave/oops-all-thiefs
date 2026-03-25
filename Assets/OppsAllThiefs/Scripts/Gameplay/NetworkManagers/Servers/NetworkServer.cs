@@ -16,13 +16,13 @@ public class NetworkServer : IDisposable
     private Dictionary<ulong, string> clientIdToAuth = new();
     private Dictionary<string, UserData> authIdToUserData = new();
 
-    private string lobbyID;
-    public string LobbyID { get { return lobbyID; } set { lobbyID = value; } }
+    private string lobbyId;
 
-    public NetworkServer(NetworkManager networkManager, NetworkObject playerPrefab)
+    public NetworkServer(NetworkManager networkManager, NetworkObject playerPrefab, string lobbyId)
     {
         this.networkManager = networkManager;
         this.playerPrefab = playerPrefab;
+        this.lobbyId = lobbyId;
 
         networkManager.ConnectionApprovalCallback += ApprovalCheck;
         networkManager.OnServerStarted += OnNetworkReady;
@@ -62,7 +62,7 @@ public class NetworkServer : IDisposable
     {
         await Task.Delay(1000);
 
-        Lobby lobby = await LobbyService.Instance.GetLobbyAsync(lobbyID);
+        Lobby lobby = await LobbyService.Instance.GetLobbyAsync(lobbyId);
         Unity.Services.Lobbies.Models.Player playerLobbyInfo = lobby.Players.Find(p => p.Id == authId);
 
         int index = lobby.Players.FindIndex(p => p.Id == authId);

@@ -67,9 +67,11 @@ public class LobbiesList : MonoBehaviour
         {
             Debug.Log(LobbyService.Instance);
             Lobby joiningLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobby.Id);
-            string joinCode = joiningLobby.Data["JoinCode"].Value;
+            string lobbyCode = joiningLobby.Data["JoinCode"].Value;
+            LobbyDataManager.Instance.LobbyID = lobby.Id;
+            LobbyDataManager.Instance.CurLobby = lobby;
 
-            await ClientHandler.Instance.GameManager.StartClientAsync(joinCode);
+            await ClientHandler.Instance.GameManager.StartClientAsync(lobbyCode);
         }
         catch (LobbyServiceException e)
         {

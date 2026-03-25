@@ -24,7 +24,7 @@ public class HostGameManager : IDisposable
     public string JoinCode {  get; private set; }
     public NetworkServer NetworkServer { get; private set; }
 
-    private const int MaxConnections = 7;
+    private const int MaxConnections = 8;
     private const string LobbySceneName = "LobbyScene";
     private const string JoinCodeKey = "JoinCode";
 
@@ -70,19 +70,21 @@ public class HostGameManager : IDisposable
             CreateLobbyOptions lobbyOptions = new CreateLobbyOptions();
 
             string playerName = PlayerPrefs.GetString(UserConstKey.GetPlayerNameKey(), "Unknown");
-            Color playerColor = Color.gray;
-            string playerColorHex = ColorUtility.ToHtmlStringRGB(playerColor);
+            string playerColorHex = (-1).ToString();
             bool playerReady = false;
 
             playerLobbyInfo = new PlayerLobbyInfo(playerName, playerColorHex, playerReady.ToString());
 
             lobbyOptions.IsPrivate = isPrivate;
-            lobbyOptions.Player = playerLobbyInfo.GetPlayerLobbyData();
+            lobbyOptions.Player = new Unity.Services.Lobbies.Models.Player(
+                    id: AuthenticationService.Instance.PlayerId,
+                    data: playerLobbyInfo.GetPlayerLobbyData());
+
             lobbyOptions.Data = new Dictionary<string, DataObject>
             {
                 {
                     "JoinCode", new DataObject(
-                        visibility: DataObject.VisibilityOptions.Member,
+                        visibility: DataObject.VisibilityOptions.Public,
                         value: JoinCode
                         )
                 }
@@ -93,6 +95,8 @@ public class HostGameManager : IDisposable
                 $"{playerName}'s Lobby", MaxConnections, lobbyOptions
                 );
             lobbyId = lobby.Id;
+            LobbyDataManager.Instance.LobbyID = lobbyId;
+            LobbyDataManager.Instance.CurLobby = lobby;
 
             // Start lobby heartbeat coroutine to keep the lobby alive
             HostHandler.Instance.StartCoroutine(HeartbeatLobby(15));
@@ -103,8 +107,7 @@ public class HostGameManager : IDisposable
             return;
         }
 
-        NetworkServer = new NetworkServer(NetworkManager.Singleton, playerPrefab);
-        NetworkServer.LobbyID = lobbyId;
+        NetworkServer = new NetworkServer(NetworkManager.Singleton, playerPrefab, lobbyId);
 
         UserData userData = new UserData
         {

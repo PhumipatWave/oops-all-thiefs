@@ -2,33 +2,25 @@ using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Services.Lobbies;
 
 public class PlayerLobbyInfo
 {
-    private Unity.Services.Lobbies.Models.Player playerLobbyData;
+    private Dictionary<string, PlayerDataObject> playerLobbyData;
 
-    public PlayerLobbyInfo(string playerName, string playerColor, string playerReady)
+    public PlayerLobbyInfo(string playerName, string playerTeamIndex, string playerReady)
     {
-        PlayerDataObject playerDO_name = new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerName);
-        PlayerDataObject playerDO_color = new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerColor);
-        PlayerDataObject playerDO_isReady = new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerReady);
-
-        playerLobbyData = new Unity.Services.Lobbies.Models.Player(id: AuthenticationService.Instance.PlayerId, data: new Dictionary<string, PlayerDataObject>
+        playerLobbyData = new Dictionary<string, PlayerDataObject>
         {
-            { "Name", playerDO_name },
-            { "Color", playerDO_color },
-            { "Ready", playerDO_isReady },
-        });
+            { "Name", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerName) },
+            { "Team", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerTeamIndex) },
+            { "Ready", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerReady) },
+        };
     }
 
-    public Unity.Services.Lobbies.Models.Player GetPlayerLobbyData()
+    public Dictionary<string, PlayerDataObject> GetPlayerLobbyData()
     {
         return playerLobbyData;
-    }
-
-    public async void UpdateLobbyInfo()
-    {
-
     }
 
     public void ClearPlayerLobbyData()

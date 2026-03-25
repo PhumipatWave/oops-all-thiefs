@@ -3,10 +3,9 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public class GameHUD : NetworkBehaviour
+public class LobbyHUD : NetworkBehaviour
 {
     [SerializeField] private TMP_Text lobbyCodeText;
-
     private NetworkVariable<FixedString32Bytes> lobbyCode = new("");
 
     public override void OnNetworkSpawn()

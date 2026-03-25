@@ -7,6 +7,7 @@ using Unity.Networking.Transport.Relay;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
@@ -17,7 +18,11 @@ public class ClientGameManager : IDisposable
     PlayerLobbyInfo playerLobbyInfo;
     private JoinAllocation allocation;
     private NetworkClient networkClient;
+
     private const string MenuSceneName = "MenuScene";
+    private const string LobbySceneName = "LobbyScene";
+
+    private string lobbyId;
 
     public async Task<bool> InitAsync()
     {
@@ -41,23 +46,10 @@ public class ClientGameManager : IDisposable
     public async Task StartClientAsync(string joinCode)
     {
         string playerName = PlayerPrefs.GetString(UserConstKey.GetPlayerNameKey(), "Unknown");
-        Color playerColor = Color.gray;
-        string playerColorHex = ColorUtility.ToHtmlStringRGB(playerColor);
+        string playerTeamIndex = (-1).ToString();
         bool playerReady = false;
 
-        playerLobbyInfo = new PlayerLobbyInfo(playerName, playerColorHex, playerReady.ToString());
-
-        try
-        {
-            await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode, new JoinLobbyByCodeOptions
-            {
-                Player = playerLobbyInfo.GetPlayerLobbyData(),
-            });
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e);
-        }
+        playerLobbyInfo = new PlayerLobbyInfo(playerName, playerTeamIndex, playerReady.ToString());
 
         try
         {
@@ -81,6 +73,15 @@ public class ClientGameManager : IDisposable
 
         string payload = JsonUtility.ToJson(userData);
         byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
+
+        await LobbyService.Instance.UpdatePlayerAsync(
+            LobbyDataManager.Instance.LobbyID,
+            AuthenticationService.Instance.PlayerId,
+            new UpdatePlayerOptions
+            {
+                Data = playerLobbyInfo.GetPlayerLobbyData()
+            }
+        );
 
         NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
         NetworkManager.Singleton.StartClient();

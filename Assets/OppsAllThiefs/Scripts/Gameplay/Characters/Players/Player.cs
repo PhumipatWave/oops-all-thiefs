@@ -2,6 +2,7 @@ using System;
 using Unity.Cinemachine;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Services.Authentication;
 using UnityEngine;
 
 public class Player : Character 
@@ -13,6 +14,7 @@ public class Player : Character
     [Header("Settings")]
     [SerializeField] private int ownerPriority = 15;
 
+    public string playerId;
     public NetworkVariable<FixedString32Bytes> PlayerName = new();
     public NetworkVariable<int> PlayerIndex = new();
 
@@ -40,6 +42,8 @@ public class Player : Character
 
         if (IsOwner)
         {
+            playerId = AuthenticationService.Instance.PlayerId;
+
             inputReader.OnMoved += Move;
             //inputReader.OnSprinted += Move;
             inputReader.OnJumped += Jump;
@@ -49,7 +53,7 @@ public class Player : Character
             playerCam.Priority = ownerPriority;
         }
 
-        Debug.Log("Player network spawned");
+        Debug.Log($"Player network spawned {playerId}");
     }
 
     public override void OnNetworkDespawn()

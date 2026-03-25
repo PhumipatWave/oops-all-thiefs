@@ -86,6 +86,7 @@ GameObject:
   - component: {fileID: 2047278148645503088}
   - component: {fileID: 3110829888026019683}
   - component: {fileID: 8642024645176725997}
+  - component: {fileID: 1251747990990985054}
   m_Layer: 5
   m_Name: PlayerContent
   m_TagString: Untagged
@@ -153,6 +154,22 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1251747990990985054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6718271854453382383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aad0b45c1709e354f9c73857c2f490bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Gameplay::PlayerLobbyItem
+  playerNameText: {fileID: 2551850978918986837}
+  playerColorImage: {fileID: 0}
+  teamIndex: 
+  isReady: 0
 --- !u!1 &6729854715542762581
 GameObject:
   m_ObjectHideFlags: 0
