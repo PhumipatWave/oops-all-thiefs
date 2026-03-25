@@ -826,7 +826,7 @@ GameObject:
   - component: {fileID: 515186064}
   - component: {fileID: 515186066}
   - component: {fileID: 515186065}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1254,7 +1254,7 @@ GameObject:
   - component: {fileID: 829930035}
   - component: {fileID: 829930034}
   - component: {fileID: 829930033}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1685,6 +1685,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: 400dol
       objectReference: {fileID: 0}
+    - target: {fileID: 8239965599649921239, guid: d471dfce0feaa564c95a9edabfcd6c5c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8239965599775485125, guid: d471dfce0feaa564c95a9edabfcd6c5c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8239965599944512417, guid: d471dfce0feaa564c95a9edabfcd6c5c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8239965600499565814, guid: d471dfce0feaa564c95a9edabfcd6c5c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8239965600531949914, guid: d471dfce0feaa564c95a9edabfcd6c5c, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -1961,7 +1981,7 @@ GameObject:
   - component: {fileID: 1515946725}
   - component: {fileID: 1515946727}
   - component: {fileID: 1515946726}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: BG_UIItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2494,7 +2514,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2043205415}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: UI_Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -33,7 +33,9 @@ public class TestItem : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!IsOwner) return;
+        if (!other.GetComponent<NetworkObject>().IsOwner) return;
+
+        interactUI.SetActive(true);
 
         if (other.CompareTag("Player"))
         {
@@ -45,7 +47,9 @@ public class TestItem : NetworkBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!IsOwner) return;
+        if (!other.GetComponent<NetworkObject>().IsOwner) return;
+
+        interactUI.SetActive(false);
 
         if (other.CompareTag("Player"))
         {
