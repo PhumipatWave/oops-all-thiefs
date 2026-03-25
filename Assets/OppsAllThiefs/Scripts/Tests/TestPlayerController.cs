@@ -1,6 +1,7 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlayerController3D : MonoBehaviour
+public class PlayerController3D : NetworkBehaviour
 {
     public float moveSpeed = 5f;
     public float jumpForce = 7f;
@@ -22,6 +23,8 @@ public class PlayerController3D : MonoBehaviour
 
     void Update()
     {
+        if (!IsOwner) return;
+
         Move();
         GroundCheck();
         Jump();

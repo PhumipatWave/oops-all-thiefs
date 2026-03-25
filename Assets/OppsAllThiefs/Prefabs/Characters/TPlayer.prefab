@@ -257,6 +257,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d84ce01d54f3d4946be9a91a41897b5c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1411596579811220618}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d84ce01d54f3d4946be9a91a41897b5c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4829438930446852797}
   m_SourcePrefab: {fileID: 100100000, guid: d84ce01d54f3d4946be9a91a41897b5c, type: 3}
 --- !u!1 &4034528553238926094 stripped
 GameObject:
@@ -368,6 +371,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2cea8355f99779479a9de8fc0edd2cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Test::PlayerController3D
+  ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 5
   jumpForce: 5
   groundDistance: 0.22
@@ -439,3 +443,39 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
+--- !u!114 &-4829438930446852797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4034528553238926094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkAnimator
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 0
+  m_Animator: {fileID: 4096196282960441294}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries:
+    - name: velX
+      NameHash: -1913334534
+      Synchronize: 1
+      ParameterType: 1
+    - name: velY
+      NameHash: -84679572
+      Synchronize: 1
+      ParameterType: 1
+    - name: isGrounded
+      NameHash: 1360771445
+      Synchronize: 1
+      ParameterType: 4
+    - name: isJumping
+      NameHash: -357477766
+      Synchronize: 1
+      ParameterType: 4
+  AnimatorParametersExpanded: 0
