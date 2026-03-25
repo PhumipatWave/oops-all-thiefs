@@ -1,39 +1,57 @@
 using TMPro;
 using UnityEngine;
+using Unity.Netcode;
 
-public class TestItem : MonoBehaviour
+public class TestItem : NetworkBehaviour
 {
-    public TextMeshProUGUI itemText;
-    private int count = 0;
+    public GameObject interactUI;
+    private bool isPlayerNearby = false;
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            AddItem();
-        }
+        if (!IsOwner) return;
 
-        if (Input.GetKeyDown(KeyCode.T))
+        if (isPlayerNearby && Input.GetKeyDown(KeyCode.E))
         {
-            SubtractItem();
+            PickUpServerRpc();
         }
     }
 
-    public void AddItem()
+    [ServerRpc]
+    void PickUpServerRpc()
     {
-        count++;
-        UpdateUI();
+        Debug.Log("Picked up item!");
+        DestroyItemClientRpc();
     }
 
-    public void SubtractItem()
+    [ClientRpc]
+    void DestroyItemClientRpc()
     {
-        if (count > 0) count--;
-        UpdateUI();
+        interactUI.SetActive(false);
+        Destroy(gameObject);
     }
 
-    void UpdateUI()
+    private void OnTriggerEnter(Collider other)
     {
-        if (itemText != null)
-            itemText.text = $"Item: ${count}";
+        if (!IsOwner) return;
+
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("Enter item!");
+            isPlayerNearby = true;
+            interactUI.SetActive(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (!IsOwner) return;
+
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("Out item!");
+            isPlayerNearby = false;
+            interactUI.SetActive(false);
+        }
     }
 }
