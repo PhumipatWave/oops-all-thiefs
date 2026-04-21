@@ -17,7 +17,7 @@ public class Player : Character
         characterStatHandle = new();
 
         rb = GetComponent<Rigidbody>();
-        //anim = GetComponent<Animator>();
+        anim = GetComponentInChildren<Animator>();
 
         if (IsOwner)
         {
@@ -50,7 +50,7 @@ public class Player : Character
     {
         if (!IsOwner) return;
 
-        if (Input.GetKeyDown(KeyCode.E))
+        /*if (Input.GetKeyDown(KeyCode.E))
         {
             Heal(10);
         }
@@ -58,7 +58,10 @@ public class Player : Character
         if (Input.GetKeyDown(KeyCode.Q))
         {
             TakeDamage(25);
-        }
+        }*/
+
+        GroundCheck();
+        UpdateAnimation();
     }
 
     private void FixedUpdate()
