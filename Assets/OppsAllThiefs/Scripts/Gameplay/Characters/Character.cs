@@ -25,7 +25,21 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     protected int currentJumpForce => charStat.JumpForce;
     protected int currentRotateSpeed => charStat.MaxRotateSpeed;
 
-    protected bool isGrounded;
+    [SerializeField] protected Transform groundRayPoint;
+    [SerializeField] protected bool isGrounded;
+    [SerializeField] protected float groundDistance = 0.4f;
+    [SerializeField] protected LayerMask groundLayer;
+
+    protected virtual void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(groundRayPoint.position, groundRayPoint.position + Vector3.down * groundDistance);
+    }
+
+    protected void GroundCheck()
+    {
+        isGrounded = Physics.Raycast(groundRayPoint.position, Vector3.down, groundDistance, groundLayer);
+    }
 
     public void Move(Vector2 dir)
     {
@@ -38,7 +52,16 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
             + transform.right * previousMovementInput.x;
         rb.linearVelocity = new Vector3(moveDir.x * currentMoveSpeed, rb.linearVelocity.y, moveDir.z * currentMoveSpeed);
 
+        float moveValue = new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude;
+        anim.SetFloat("velX", moveValue);
+
         Debug.Log($"Player move {moveDir}");
+    }
+
+    protected void UpdateAnimation()
+    {
+        anim.SetBool("isGrounded", isGrounded);
+        anim.SetBool("isJumping", !isGrounded);
     }
 
     /// <summary>
