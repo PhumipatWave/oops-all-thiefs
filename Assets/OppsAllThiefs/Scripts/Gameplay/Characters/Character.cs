@@ -112,8 +112,28 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         {
             Debug.Log("Player attack");
             anim.SetTrigger("isAttack");
-            attackHitBox.SetActive(true);
+            EnableAttackHitBoxServerRpc();
         }
+    }
+
+    [ServerRpc]
+    public void EnableAttackHitBoxServerRpc()
+    {
+        EnableAttackHitBoxClientRpc();
+    }
+
+    [ClientRpc]
+    public void EnableAttackHitBoxClientRpc()
+    {
+        attackHitBox.SetActive(true);
+        // Auto disable after attack duration
+        StartCoroutine(DisableHitBoxAfterDelay(0.3f));
+    }
+
+    private System.Collections.IEnumerator DisableHitBoxAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        attackHitBox.SetActive(false);
     }
 
     public void Heal(int amount)
@@ -131,7 +151,7 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     }
 
     // Test Modify
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void ModifyStatServerRpc(int amount)
     {
         if (CurrentHealth.Value <= 0) return;

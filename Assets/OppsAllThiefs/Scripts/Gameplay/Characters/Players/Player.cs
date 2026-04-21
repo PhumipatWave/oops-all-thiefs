@@ -104,14 +104,17 @@ public class Player : Character
 
                 // Tell server → broadcast to ALL clients to spawn weapon locally
                 EquipWeaponServerRpc(weaponIndex);
+            }
+        }
 
-                /*item.CollectWeaponItemServerRpc();
-                equippedWeapon = weaponItem.WeaponPrefab;
-                isEquipeWeapon = true;
-
-                GameObject weapon = Instantiate(weaponItem.WeaponPrefab, Vector3.zero, Quaternion.identity, weaponHoldPoint);
-                weapon.transform.localPosition = Vector3.zero;
-                weapon.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);*/
+        if (other.CompareTag("HitBox"))
+        {
+            // Make sure we don't hit ourselves
+            // Check the hitbox doesn't belong to this player
+            if (other.transform.root != transform)
+            {
+                Debug.Log("Player hit by another player's attack");
+                TakeDamage(10);
             }
         }
     }
