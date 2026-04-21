@@ -5,6 +5,8 @@ using UnityEngine;
 public class Item : NetworkBehaviour
 {
     [SerializeField] private ItemBaseStat itemStat;
+    public ItemBaseStat ItemStat { get { return itemStat; } }
+
     [SerializeField] private Transform itemModel;
 
     public event Action<Item> OnCollected;
@@ -15,33 +17,46 @@ public class Item : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        ValueItemBaseStat valueItemBaseStat = itemStat as ValueItemBaseStat;
-        SetValue(valueItemBaseStat.MoneyValue);
+        if (itemStat is ValueItemBaseStat valueItemBaseStat)
+        {
+            SetValue(valueItemBaseStat.MoneyValue);
+        }
     }
 
-    public int Collect()
+    [ServerRpc(RequireOwnership = false)]
+    public void CollectValueItemServerRpc(ServerRpcParams rpcParams = default)
     {
-        if (!IsServer)
-        {
-            Show(false);
-            return 0;
-        }
-
         if (alreadyCollected)
         {
-            return 0;
+            return;
         }
 
         alreadyCollected = true;
+        OnCollected?.Invoke(this); 
+        HideItemClientRpc();
+    }
 
-        OnCollected?.Invoke(this);
+    [ServerRpc(RequireOwnership = false)]
+    public void CollectWeaponItemServerRpc()
+    {
+        if (alreadyCollected)
+        {
+            return;
+        }
 
-        return currentItemValue;
+        alreadyCollected = true;
+        HideItemClientRpc();
     }
 
     public void SetValue(int value)
     {
         currentItemValue = value;
+    }
+
+    [ClientRpc]
+    private void HideItemClientRpc()
+    {
+        Show(false);
     }
 
     protected void Show(bool show)

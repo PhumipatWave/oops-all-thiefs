@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: V_ATM
   m_EditorClassIdentifier: Game.Core::ValueItemBaseStat
   ItemName: ATM
-  ItemPrefab: {fileID: 0}
+  ItemPrefab: {fileID: 5540370406812440391, guid: f7b2313a7ea7d3c468c920137406f346, type: 3}
   MoneyValue: 100

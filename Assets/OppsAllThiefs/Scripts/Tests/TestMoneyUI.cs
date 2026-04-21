@@ -8,7 +8,7 @@ public class TestMoneyUI : MonoBehaviour
     public TextMeshProUGUI moneyText;
     private int money = 0;
     
-    void Update()
+    /*void Update()
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
@@ -19,7 +19,7 @@ public class TestMoneyUI : MonoBehaviour
         {
             SubtractItem();
         }
-    }
+    }*/
     
     public void AddItem()
     {

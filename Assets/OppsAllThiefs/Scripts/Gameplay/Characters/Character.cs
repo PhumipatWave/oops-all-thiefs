@@ -5,26 +5,46 @@ using UnityEngine.EventSystems;
 
 public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHealthable
 {
+    [Header("Character Status")]
     [SerializeField] protected CharacterBaseStat charStat;
     protected CharacterStatHandle characterStatHandle;
 
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator anim;
-    public event Action OnDeath;
 
     protected Vector3 previousMovementInput;
 
     public NetworkVariable<int> CurrentHealth = new NetworkVariable<int>();
     public NetworkVariable<int> CurrentMoney = new NetworkVariable<int>();
 
+    public event Action OnDeath;
+
     public int MaxHealth => charStat.MaxHealth;
 
     protected int currentMoveSpeed => charStat.MinMoveSpeed;
     protected int currentJumpForce => charStat.JumpForce;
+    protected int currentRotateSpeed => charStat.MaxRotateSpeed;
 
-    protected int currentRotateSpeed = 5;
+    [SerializeField] protected Transform groundRayPoint;
+    [SerializeField] protected bool isGrounded;
+    [SerializeField] protected float groundDistance = 0.4f;
+    [SerializeField] protected LayerMask groundLayer;
 
-    protected bool isGrounded;
+    protected bool isEquipeWeapon;
+    [SerializeField] protected Transform weaponHoldPoint;
+    [SerializeField] protected GameObject equippedWeapon;
+    [SerializeField] protected GameObject attackHitBox;
+
+    protected virtual void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(groundRayPoint.position, groundRayPoint.position + Vector3.down * groundDistance);
+    }
+
+    protected void GroundCheck()
+    {
+        isGrounded = Physics.Raycast(groundRayPoint.position, Vector3.down, groundDistance, groundLayer);
+    }
 
     public void Move(Vector2 dir)
     {
@@ -35,9 +55,18 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     {
         Vector3 moveDir = transform.forward * previousMovementInput.y
             + transform.right * previousMovementInput.x;
-        rb.linearVelocity = moveDir * currentMoveSpeed;
+        rb.linearVelocity = new Vector3(moveDir.x * currentMoveSpeed, rb.linearVelocity.y, moveDir.z * currentMoveSpeed);
 
-        Debug.Log($"Player move {moveDir}");
+        float moveValue = new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude;
+        anim.SetFloat("velX", moveValue);
+
+        //Debug.Log($"Player move {moveDir}");
+    }
+
+    protected void UpdateAnimation()
+    {
+        anim.SetBool("isGrounded", isGrounded);
+        anim.SetBool("isJumping", !isGrounded);
     }
 
     /// <summary>
@@ -79,7 +108,12 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     public void Attack()
     {
-        Debug.Log("Player attack");
+        if (isGrounded && isEquipeWeapon)
+        {
+            Debug.Log("Player attack");
+            anim.SetTrigger("isAttack");
+            attackHitBox.SetActive(true);
+        }
     }
 
     public void Heal(int amount)

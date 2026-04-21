@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2473d478ec3859f4e844f9e1e8c90f94, type: 3}
-  m_Name: W_Stick
+  m_Name: W_Hammer
   m_EditorClassIdentifier: Game.Core::WeaponItemBaseStat
-  ItemName: Stick
-  ItemPrefab: {fileID: 0}
-  Damage: 10
-  AttackSpeed: 5
+  ItemID: 2
+  ItemName: Hammer
+  Damage: 30
+  AttackSpeed: 0.25
+  WeaponPrefab: {fileID: 5859952178022635876, guid: 6459f86ea18d72d498166eb7fbdeab0a, type: 3}
