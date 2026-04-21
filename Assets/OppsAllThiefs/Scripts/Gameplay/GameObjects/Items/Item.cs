@@ -23,41 +23,40 @@ public class Item : NetworkBehaviour
         }
     }
 
-    public int CollectValueItem()
+    [ServerRpc(RequireOwnership = false)]
+    public void CollectValueItemServerRpc(ServerRpcParams rpcParams = default)
     {
-        if (!IsServer)
-        {
-            Show(false);
-            return 0;
-        }
-
         if (alreadyCollected)
         {
-            return 0;
+            return;
         }
 
         alreadyCollected = true;
-        OnCollected?.Invoke(this);
-        return currentItemValue;
+        OnCollected?.Invoke(this); 
+        HideItemClientRpc();
     }
 
-    public void CollectWeaponItem()
+    [ServerRpc(RequireOwnership = false)]
+    public void CollectWeaponItemServerRpc()
     {
-        if (!IsServer)
-        {
-            Show(false);
-            return;
-        }
-
         if (alreadyCollected)
         {
             return;
         }
+
+        alreadyCollected = true;
+        HideItemClientRpc();
     }
 
     public void SetValue(int value)
     {
         currentItemValue = value;
+    }
+
+    [ClientRpc]
+    private void HideItemClientRpc()
+    {
+        Show(false);
     }
 
     protected void Show(bool show)

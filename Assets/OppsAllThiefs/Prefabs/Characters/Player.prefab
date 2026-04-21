@@ -723,6 +723,7 @@ MonoBehaviour:
   attackHitBox: {fileID: 6993557013172635100}
   inputReader: {fileID: 11400000, guid: 8a28bf6a16a2bb8489db03a9e1fc5178, type: 2}
   playerCam: {fileID: 1623077424568131081}
+  weaponRegistry: {fileID: 11400000, guid: 3710b4a7715679c48959853ef322e6f3, type: 2}
   ownerPriority: 15
 --- !u!114 &5636428387649091413
 MonoBehaviour:

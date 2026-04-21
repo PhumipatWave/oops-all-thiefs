@@ -1,4 +1,4 @@
-using Unity.Cinemachine;
+﻿using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,6 +7,8 @@ public class Player : Character
     [Header("Player Component")]
     [SerializeField] private InputReader inputReader;
     [SerializeField] private CinemachineCamera playerCam;
+
+    [SerializeField] private WeaponRegistry weaponRegistry;
 
     [Header("Settings")]
     [SerializeField] private int ownerPriority = 15;
@@ -82,27 +84,72 @@ public class Player : Character
 
         if (other.TryGetComponent(out Item item))
         {
-            if (item.ItemStat is ValueItemBaseStat)
+            if (item.ItemStat is ValueItemBaseStat valueItem)
             {
-                int collectedValue = item.CollectValueItem();
-
-                if (IsServer)
-                {
-                    CurrentMoney.Value += collectedValue;
-                    Debug.Log($"Player collected item: {collectedValue}, Current Money: {CurrentMoney.Value}");
-                }
+                item.CollectValueItemServerRpc();
+                AddMoneyServerRpc(valueItem.MoneyValue);
             }
             else if (item.ItemStat is WeaponItemBaseStat weaponItem && !isEquipeWeapon)
             {
-                item.CollectWeaponItem();
+                int weaponIndex = weaponRegistry.GetIndex(weaponItem.WeaponPrefab);
+                if (weaponIndex < 0)
+                {
+                    Debug.LogError("Weapon not found in WeaponRegistry!");
+                    return;
+                }
+
+                isEquipeWeapon = true;
+
+                item.CollectWeaponItemServerRpc();
+
+                // Tell server → broadcast to ALL clients to spawn weapon locally
+                EquipWeaponServerRpc(weaponIndex);
+
+                /*item.CollectWeaponItemServerRpc();
                 equippedWeapon = weaponItem.WeaponPrefab;
                 isEquipeWeapon = true;
 
                 GameObject weapon = Instantiate(weaponItem.WeaponPrefab, Vector3.zero, Quaternion.identity, weaponHoldPoint);
                 weapon.transform.localPosition = Vector3.zero;
-                weapon.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
+                weapon.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);*/
             }
         }
+    }
+
+    [ServerRpc]
+    private void AddMoneyServerRpc(int amount)
+    {
+        CurrentMoney.Value += amount;
+    }
+
+    [ServerRpc]
+    private void EquipWeaponServerRpc(int weaponIndex)
+    {
+        EquipWeaponClientRpc(weaponIndex);
+    }
+
+    [ClientRpc]
+    private void EquipWeaponClientRpc(int weaponIndex)
+    {
+        GameObject prefab = weaponRegistry.GetPrefab(weaponIndex);
+        if (prefab == null)
+        {
+            Debug.LogError($"No prefab at index {weaponIndex} in WeaponRegistry");
+            return;
+        }
+
+        // Destroy old weapon if any
+        if (equippedWeapon != null)
+            Destroy(equippedWeapon);
+
+        // Spawn directly under weaponHoldPoint (your hand bone Transform)
+        equippedWeapon = Instantiate(prefab, weaponHoldPoint);
+        equippedWeapon.transform.localPosition = Vector3.zero;
+        equippedWeapon.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
+
+        isEquipeWeapon = true;
+
+        Debug.Log($"Weapon equipped on {gameObject.name}: {prefab.name}");
     }
 
     private void RotatorToCam()
