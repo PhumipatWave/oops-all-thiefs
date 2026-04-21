@@ -19,6 +19,8 @@ public class Player : Character
         rb = GetComponent<Rigidbody>();
         anim = GetComponentInChildren<Animator>();
 
+        attackHitBox.SetActive(false);
+
         if (IsOwner)
         {
             inputReader.OnMoved += Move;
@@ -68,20 +70,37 @@ public class Player : Character
     {
         if (!IsOwner) return;
 
-        Debug.Log("Player FixedUpdate");
+        //Debug.Log("Player FixedUpdate");
         HandleMove();
         RotatorToCam();
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!IsOwner)
+            return;
+
         if (other.TryGetComponent(out Item item))
         {
-            int collectedValue = item.Collect();
-
-            if (IsServer)
+            if (item.ItemStat is ValueItemBaseStat)
             {
-                CurrentMoney.Value += collectedValue;
+                int collectedValue = item.CollectValueItem();
+
+                if (IsServer)
+                {
+                    CurrentMoney.Value += collectedValue;
+                    Debug.Log($"Player collected item: {collectedValue}, Current Money: {CurrentMoney.Value}");
+                }
+            }
+            else if (item.ItemStat is WeaponItemBaseStat weaponItem && !isEquipeWeapon)
+            {
+                item.CollectWeaponItem();
+                equippedWeapon = weaponItem.WeaponPrefab;
+                isEquipeWeapon = true;
+
+                GameObject weapon = Instantiate(weaponItem.WeaponPrefab, Vector3.zero, Quaternion.identity, weaponHoldPoint);
+                weapon.transform.localPosition = Vector3.zero;
+                weapon.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
             }
         }
     }

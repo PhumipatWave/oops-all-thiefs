@@ -30,6 +30,11 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     [SerializeField] protected float groundDistance = 0.4f;
     [SerializeField] protected LayerMask groundLayer;
 
+    protected bool isEquipeWeapon;
+    [SerializeField] protected Transform weaponHoldPoint;
+    [SerializeField] protected GameObject equippedWeapon;
+    [SerializeField] protected GameObject attackHitBox;
+
     protected virtual void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
@@ -55,7 +60,7 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         float moveValue = new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude;
         anim.SetFloat("velX", moveValue);
 
-        Debug.Log($"Player move {moveDir}");
+        //Debug.Log($"Player move {moveDir}");
     }
 
     protected void UpdateAnimation()
@@ -103,7 +108,12 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     public void Attack()
     {
-        Debug.Log("Player attack");
+        if (isGrounded && isEquipeWeapon)
+        {
+            Debug.Log("Player attack");
+            anim.SetTrigger("isAttack");
+            attackHitBox.SetActive(true);
+        }
     }
 
     public void Heal(int amount)
