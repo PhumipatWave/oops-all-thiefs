@@ -2,17 +2,22 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class NetworkServer : IDisposable
 {
     private NetworkManager networkManager;
+    private NetworkObject playerPrefab;
+
+    public Action<string> OnClientLeft;
 
     private Dictionary<ulong, string> clientIdToAuth = new();
     private Dictionary<string, UserData> authIdToUserData = new();
 
-    public NetworkServer(NetworkManager networkManager)
+    public NetworkServer(NetworkManager networkManager, NetworkObject playerPrefab)
     {
         this.networkManager = networkManager;
+        this.playerPrefab = playerPrefab;
 
         networkManager.ConnectionApprovalCallback += ApprovalCheck;
         networkManager.OnServerStarted += OnNetworkReady;
@@ -26,6 +31,8 @@ public class NetworkServer : IDisposable
         clientIdToAuth[request.ClientNetworkId] = userData.UserAuthId;
         authIdToUserData[userData.UserAuthId] = userData;
         Debug.Log($"User Name : {userData.UserName}");
+
+        _ = SpawnPlayerDelayed(request.ClientNetworkId);
 
         response.Approved = true;
         response.CreatePlayerObject = true;
@@ -42,7 +49,32 @@ public class NetworkServer : IDisposable
         {
             clientIdToAuth.Remove(clientId);
             authIdToUserData.Remove(authId);
+            OnClientLeft?.Invoke(authId);
         }
+    }
+
+    private async Task SpawnPlayerDelayed(ulong clientId)
+    {
+        await Task.Delay(1000);
+
+        // For Test************************************************************************
+        NetworkObject playerInstance = GameObject.Instantiate(playerPrefab, /*SpawnPoint.GetRandomSpawnPos()*/ Vector3.zero, Quaternion.identity);
+        //*********************************************************************************
+
+        playerInstance.SpawnAsPlayerObject(clientId);
+    }
+
+    public UserData GetUserDataByClientId(ulong clientId)
+    {
+        if (clientIdToAuth.TryGetValue(clientId, out string authId))
+        {
+            if (authIdToUserData.TryGetValue(authId, out UserData data))
+            {
+                return data;
+            }
+            return null;
+        }
+        return null;
     }
 
     public void Dispose()

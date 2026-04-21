@@ -1,5 +1,5 @@
-using System;
 using System.Threading.Tasks;
+using Unity.Netcode;
 using UnityEngine;
 
 public class ApplicationController : MonoBehaviour
@@ -7,6 +7,7 @@ public class ApplicationController : MonoBehaviour
     [Header("Network Components")]
     [SerializeField] private ClientHandler clientPrefab;
     [SerializeField] private HostHandler hostPrefab;
+    [SerializeField] private NetworkObject playerPrefab;
 
     private async void Start()
     {
@@ -19,7 +20,7 @@ public class ApplicationController : MonoBehaviour
         if (!isDedicatedServer)
         {
             HostHandler hostHandler = Instantiate(hostPrefab);
-            hostHandler.CreateHost();
+            hostHandler.CreateHost(playerPrefab);
 
             ClientHandler clientHandler = Instantiate(clientPrefab);
             bool authenticated = await clientHandler.CreateClient();

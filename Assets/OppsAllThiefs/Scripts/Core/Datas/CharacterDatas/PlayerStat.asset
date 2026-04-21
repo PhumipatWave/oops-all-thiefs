@@ -15,5 +15,6 @@ MonoBehaviour:
   MaxHealth: 100
   MinMoveSpeed: 10
   MaxMoveSpeed: 15
+  MaxRotateSpeed: 5
   JumpForce: 10
   MaxMoney: 500

@@ -6,7 +6,7 @@ public class Player : Character
 {
     [Header("Player Component")]
     [SerializeField] private InputReader inputReader;
-    [SerializeField] private CinemachineCamera playerCamera;
+    [SerializeField] private CinemachineCamera playerCam;
 
     [Header("Settings")]
     [SerializeField] private int ownerPriority = 15;
@@ -27,7 +27,7 @@ public class Player : Character
             inputReader.OnInteracted += Interact;
             inputReader.OnAttacked += Attack;
 
-            playerCamera.Priority = ownerPriority;
+            playerCam.Priority = ownerPriority;
         }
 
         if (IsServer)
@@ -67,7 +67,7 @@ public class Player : Character
 
         Debug.Log("Player FixedUpdate");
         HandleMove();
-        MoveRotator();
+        RotatorToCam();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -80,6 +80,21 @@ public class Player : Character
             {
                 CurrentMoney.Value += collectedValue;
             }
+        }
+    }
+
+    private void RotatorToCam()
+    {
+        Vector3 camForward = playerCam.transform.forward;
+        camForward.y = 0;
+        camForward.Normalize();
+
+        if (camForward.sqrMagnitude > .01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(camForward);
+            Quaternion smoothRotation = Quaternion.Slerp(transform.rotation, targetRotation, currentRotateSpeed * Time.fixedDeltaTime);
+
+            rb.MoveRotation(smoothRotation);
         }
     }
 }
