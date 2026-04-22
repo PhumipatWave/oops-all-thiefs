@@ -1,8 +1,10 @@
-using UnityEngine;
-using Unity.Netcode;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Netcode;
+using UnityEditor.PackageManager.Requests;
+using UnityEngine;
+using static Unity.Networking.Transport.NetworkPipelineStage;
 
 public class NetworkServer : IDisposable
 {
@@ -35,7 +37,7 @@ public class NetworkServer : IDisposable
         _ = SpawnPlayerDelayed(request.ClientNetworkId);
 
         response.Approved = true;
-        response.CreatePlayerObject = true;
+        response.CreatePlayerObject = false;
     }
 
     private void OnNetworkReady()
@@ -55,11 +57,11 @@ public class NetworkServer : IDisposable
 
     private async Task SpawnPlayerDelayed(ulong clientId)
     {
-        await Task.Delay(1000);
+        await Task.Delay(3000);
 
-        // For Test************************************************************************
-        NetworkObject playerInstance = GameObject.Instantiate(playerPrefab, /*SpawnPoint.GetRandomSpawnPos()*/ Vector3.zero, Quaternion.identity);
-        //*********************************************************************************
+        var clients = NetworkManager.Singleton.ConnectedClientsList;
+
+        NetworkObject playerInstance = GameObject.Instantiate(playerPrefab, PlayerSpawnPoint.GetSpawnIndexPos(), Quaternion.identity);
 
         playerInstance.SpawnAsPlayerObject(clientId);
     }

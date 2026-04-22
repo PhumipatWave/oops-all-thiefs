@@ -42,11 +42,19 @@ public class Player : Character
 
     public override void OnNetworkDespawn()
     {
+        if (!IsOwner)
+            return;
+        
         inputReader.OnMoved -= Move;
         //inputReader.OnSprinted -= Move;
         inputReader.OnJumped -= Jump;
         inputReader.OnInteracted -= Interact;
         inputReader.OnAttacked -= Attack;
+    }
+
+    private void Start()
+    {
+        Debug.Log($"Owner? {IsOwner} | ClientId: {OwnerClientId}");
     }
 
     // Test health
