@@ -114,7 +114,9 @@ public class Player : Character
             if (other.transform.root != transform)
             {
                 Debug.Log("Player hit by another player's attack");
-                TakeDamage(10);
+                Vector3 knockbackDir = (transform.position - other.transform.position).normalized;
+
+                TakeDamage(10, knockbackDir);
             }
         }
     }
@@ -149,8 +151,6 @@ public class Player : Character
         equippedWeapon = Instantiate(prefab, weaponHoldPoint);
         equippedWeapon.transform.localPosition = Vector3.zero;
         equippedWeapon.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
-
-        isEquipeWeapon = true;
 
         Debug.Log($"Weapon equipped on {gameObject.name}: {prefab.name}");
     }

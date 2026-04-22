@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3487494943
+  GlobalObjectIdHash: 1812325927
   InScenePlacedSourceGlobalObjectIdHash: 3459726948
   DeferredDespawnTick: 0
   Ownership: 1
@@ -205,15 +205,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7659451676801253087, guid: 02a6f782f24d19843b60c5c454a0ff82, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.22222224
+      value: 0.99999994
       objectReference: {fileID: 0}
     - target: {fileID: 7659451676801253087, guid: 02a6f782f24d19843b60c5c454a0ff82, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.22222222
+      value: 0.99999994
       objectReference: {fileID: 0}
     - target: {fileID: 7659451676801253087, guid: 02a6f782f24d19843b60c5c454a0ff82, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.22222222
+      value: 0.99999994
       objectReference: {fileID: 0}
     - target: {fileID: 7659451676801253087, guid: 02a6f782f24d19843b60c5c454a0ff82, type: 3}
       propertyPath: m_LocalPosition.x
@@ -254,6 +254,10 @@ PrefabInstance:
     - target: {fileID: 7659451676801253087, guid: 02a6f782f24d19843b60c5c454a0ff82, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7659451676801253087, guid: 02a6f782f24d19843b60c5c454a0ff82, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

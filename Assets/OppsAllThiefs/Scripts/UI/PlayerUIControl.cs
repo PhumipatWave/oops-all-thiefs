@@ -7,6 +7,8 @@ public class PlayerUIControl : NetworkBehaviour
     [Header("Player Component")]
     [SerializeField] private Character player;
 
+    private GameObject gameHUD;
+
     [Header("UI Component")]
     [SerializeField] private GameObject healthBarObject;
     [SerializeField] private Image healthBarImage;
@@ -14,7 +16,9 @@ public class PlayerUIControl : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
+        {
             healthBarObject.SetActive(false);
+        }
 
         if (IsClient)
         {

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PlayerStat
   m_EditorClassIdentifier: Game.Core::CharacterBaseStat
   MaxHealth: 100
-  MinMoveSpeed: 10
-  MaxMoveSpeed: 15
-  MaxRotateSpeed: 5
-  JumpForce: 10
+  MinMoveSpeed: 6
+  MaxMoveSpeed: 8
+  MaxRotateSpeed: 3
+  JumpForce: 6
   MaxMoney: 500

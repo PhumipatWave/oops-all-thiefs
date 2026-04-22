@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.HID;
 
 public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHealthable
 {
@@ -32,8 +34,14 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     protected bool isEquipeWeapon;
     [SerializeField] protected Transform weaponHoldPoint;
+
     [SerializeField] protected GameObject equippedWeapon;
+    //[SerializeField] protected WeaponItemBaseStat equippedWeaponStat;
+
     [SerializeField] protected GameObject attackHitBox;
+
+    protected bool isKnockBack;
+    [SerializeField] protected float knockBackDuration = 0.5f;
 
     protected virtual void OnDrawGizmos()
     {
@@ -53,6 +61,9 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     protected void HandleMove()
     {
+        if (isKnockBack) 
+            return;
+
         Vector3 moveDir = transform.forward * previousMovementInput.y
             + transform.right * previousMovementInput.x;
         rb.linearVelocity = new Vector3(moveDir.x * currentMoveSpeed, rb.linearVelocity.y, moveDir.z * currentMoveSpeed);
@@ -143,11 +154,12 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         ModifyStatServerRpc(amount);
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount, Vector3 dir)
     {
         //CurrentHealth.Value = characterStatHandle.ModifyStat(CurrentHealth.Value, charStat.MaxHealth, -amount);
 
         ModifyStatServerRpc(-amount);
+        KnockbackServerRpc(dir);
     }
 
     // Test Modify
@@ -164,6 +176,30 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         {
             Death();
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void KnockbackServerRpc(Vector3 direction)
+    {
+        Vector3 knockDir = new Vector3(direction.x, 0f, direction.z).normalized;
+        rb.AddForce(knockDir * 30f, ForceMode.Impulse);
+
+        Debug.Log($"Knock back dir : {knockDir * 30f}");
+
+        KnockbackClientRpc(direction);
+    }
+
+    [ClientRpc]
+    public void KnockbackClientRpc(Vector3 direction)
+    {
+        StartCoroutine(KnockbackRoutine());
+    }
+
+    protected IEnumerator KnockbackRoutine()
+    {
+        isKnockBack = true;
+        yield return new WaitForSeconds(knockBackDuration);
+        isKnockBack = false;
     }
 
     public void Death()
