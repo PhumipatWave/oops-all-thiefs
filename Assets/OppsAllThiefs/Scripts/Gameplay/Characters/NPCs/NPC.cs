@@ -11,7 +11,8 @@ public class NPC : NetworkBehaviour
     [SerializeField] private float speed = 2f;
     [SerializeField] private float waitTime = 2f;
 
-    private int currentIndex = 0;
+    private int currentIndex = 0; 
+    private int direction = 1;
 
     private float waitTimer = 0f;
     private bool isWaiting = false;
@@ -32,6 +33,8 @@ public class NPC : NetworkBehaviour
             return;
         }
 
+        anim.SetBool("isMove", !isWaiting);
+
         if (isWaiting)
         {
             HandleWaiting();
@@ -49,17 +52,16 @@ public class NPC : NetworkBehaviour
         Vector3 dir = (target.position - transform.position).normalized;
 
         rb.linearVelocity = dir * speed;
-        anim.SetFloat("vel", rb.linearVelocity.magnitude);
 
         if (dir != Vector3.zero)
         {
             Quaternion rot = Quaternion.LookRotation(dir);
-            rb.MoveRotation(Quaternion.Lerp(rb.rotation, rot, 5f * Time.fixedDeltaTime));
+            rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, rot, 360f * Time.fixedDeltaTime));
         }
 
         float distance = Vector3.Distance(transform.position, target.position);
 
-        if (distance < 0.1f)
+        if (distance < 0.2f)
         {
             isWaiting = true;
             waitTimer = waitTime;
@@ -74,11 +76,18 @@ public class NPC : NetworkBehaviour
         if (waitTimer <= 0f)
         {
             isWaiting = false;
-
-            currentIndex++;
+            currentIndex += direction;
 
             if (currentIndex >= waypoints.Length)
-                currentIndex = 0;
+            {
+                direction = -1;
+                currentIndex = waypoints.Length - 2;
+            }
+            else if (currentIndex < 0)
+            {
+                direction = 1;
+                currentIndex = 1;
+            }
         }
     }
 }

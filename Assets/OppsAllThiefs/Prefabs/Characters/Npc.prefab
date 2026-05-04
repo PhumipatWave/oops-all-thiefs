@@ -102,7 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 931246675
+  GlobalObjectIdHash: 2363664526
   InScenePlacedSourceGlobalObjectIdHash: 4039451704
   DeferredDespawnTick: 0
   Ownership: 1
@@ -940,7 +940,7 @@ Animator:
   m_GameObject: {fileID: 6258930816435152132}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 8a643f76f52856b439f627bcd1e48dd3, type: 2}
+  m_Controller: {fileID: 9100000, guid: 178c3c161a016824ba6d42f83f45c209, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -971,26 +971,10 @@ MonoBehaviour:
   TransitionStateInfoList: []
   AnimatorParameterEntries:
     ParameterEntries:
-    - name: velX
-      NameHash: -1913334534
+    - name: vel
+      NameHash: -206340255
       Synchronize: 1
       ParameterType: 1
-    - name: velY
-      NameHash: -84679572
-      Synchronize: 1
-      ParameterType: 1
-    - name: isGrounded
-      NameHash: 1360771445
-      Synchronize: 1
-      ParameterType: 4
-    - name: isJumping
-      NameHash: -357477766
-      Synchronize: 1
-      ParameterType: 4
-    - name: isAttack
-      NameHash: -2035800095
-      Synchronize: 1
-      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!4 &6744106108185264062 stripped
 Transform:

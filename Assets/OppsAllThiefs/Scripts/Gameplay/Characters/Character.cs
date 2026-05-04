@@ -41,7 +41,9 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     [SerializeField] protected GameObject attackHitBox;
 
     protected bool isKnockBack;
-    [SerializeField] protected float knockBackDuration = 0.5f;
+    [SerializeField] protected float knockBackPower = 50.5f;
+    [SerializeField] protected float knockBackUpPower = 25f;
+    [SerializeField] protected float knockBackDuration = 0.8f;
 
     protected virtual void OnDrawGizmos()
     {
@@ -181,17 +183,15 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     [ServerRpc(RequireOwnership = false)]
     public void KnockbackServerRpc(Vector3 direction)
     {
-        Vector3 knockDir = new Vector3(direction.x, 0f, direction.z).normalized;
-        rb.AddForce(knockDir * 30f, ForceMode.Impulse);
-
-        Debug.Log($"Knock back dir : {knockDir * 30f}");
-
         KnockbackClientRpc(direction);
     }
 
     [ClientRpc]
     public void KnockbackClientRpc(Vector3 direction)
     {
+        Vector3 knockDir = new Vector3(direction.x, knockBackUpPower, direction.z).normalized;
+        rb.AddForce(knockDir * knockBackPower, ForceMode.Impulse);
+
         StartCoroutine(KnockbackRoutine());
     }
 
