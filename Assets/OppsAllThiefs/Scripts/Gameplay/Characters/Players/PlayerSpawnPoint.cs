@@ -25,4 +25,9 @@ public class PlayerSpawnPoint : MonoBehaviour
         int index = Random.Range(0, spawnPoints.Count);
         return spawnPoints[index].transform.position;
     }
+
+    public static bool HasSpawnPoints()
+    {
+        return spawnPoints.Count > 0;
+    }
 }

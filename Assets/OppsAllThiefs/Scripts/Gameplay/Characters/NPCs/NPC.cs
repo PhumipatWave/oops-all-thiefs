@@ -1,6 +1,5 @@
 using Unity.Netcode;
 using UnityEngine;
-using static Codice.Client.Commands.WkTree.WorkspaceTreeNode;
 
 public class NPC : NetworkBehaviour
 {

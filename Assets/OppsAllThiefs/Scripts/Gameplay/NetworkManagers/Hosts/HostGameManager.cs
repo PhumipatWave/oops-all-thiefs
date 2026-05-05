@@ -97,24 +97,35 @@ public class HostGameManager : IDisposable
 
         NetworkServer = new NetworkServer(NetworkManager.Singleton, playerPrefab);
 
-        // Team Not Finish *************************************************************************
         UserData userData = new UserData
         {
             UserName = PlayerPrefs.GetString(UserConstKey.GetPlayerNameKey(), "Missing Name"),
             UserAuthId = AuthenticationService.Instance.PlayerId,
-            //teamIndex = PlayerPrefs.GetInt(TeamSelector.PlayerTeamKey, 0)
         };
-        //**********************************************************************************
 
         // Convert the user data to JSON
         string payload = JsonUtility.ToJson(userData);
         // Then convert to bytes for sending over the network
         byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
+        // In HostGameManager.StartHostAsync, just before NetworkManager.Singleton.StartHost()
+        var allObjects = GameObject.FindObjectsByType<NetworkObject>(FindObjectsSortMode.None);
+        foreach (var obj in allObjects)
+        {
+            var behaviours = obj.GetComponents<NetworkBehaviour>();
+            foreach (var b in behaviours)
+                Debug.Log($"[PreHost] {obj.name} → {b.GetType().Name}");
+        }
+
         NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
-        NetworkManager.Singleton.StartHost();
         NetworkServer.OnClientLeft += HandleClientLeft;
-        NetworkManager.Singleton.SceneManager.LoadScene(GameSceneName, LoadSceneMode.Single);
+        
+        NetworkManager.Singleton.OnServerStarted += () =>
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene(GameSceneName, LoadSceneMode.Single);
+        };
+
+        NetworkManager.Singleton.StartHost();
     }
 
     /// <summary>

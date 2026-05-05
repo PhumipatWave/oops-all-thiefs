@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Unity.Netcode;
-using UnityEditor.PackageManager.Requests;
 using UnityEngine;
-using static Unity.Networking.Transport.NetworkPipelineStage;
+using UnityEngine.SceneManagement;
 
 public class NetworkServer : IDisposable
 {
@@ -25,24 +23,61 @@ public class NetworkServer : IDisposable
         networkManager.OnServerStarted += OnNetworkReady;
     }
 
-    private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+    private void ApprovalCheck(
+        NetworkManager.ConnectionApprovalRequest request,
+        NetworkManager.ConnectionApprovalResponse response)
     {
         string payload = System.Text.Encoding.UTF8.GetString(request.Payload);
         UserData userData = JsonUtility.FromJson<UserData>(payload);
 
         clientIdToAuth[request.ClientNetworkId] = userData.UserAuthId;
         authIdToUserData[userData.UserAuthId] = userData;
-        Debug.Log($"User Name : {userData.UserName}");
-
-        _ = SpawnPlayerDelayed(request.ClientNetworkId);
 
         response.Approved = true;
         response.CreatePlayerObject = false;
+        response.Pending = false;
     }
 
     private void OnNetworkReady()
     {
+        networkManager.OnClientConnectedCallback += OnClientConnected;
         networkManager.OnClientDisconnectCallback += OnClientDisconnect;
+
+        networkManager.OnServerStarted -= OnNetworkReady;
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        HostHandler.Instance.StartCoroutine(SpawnWhenReady(clientId));
+    }
+
+    private System.Collections.IEnumerator SpawnWhenReady(ulong clientId)
+    {
+        // wait until gameplay scene is actually active
+        yield return new WaitUntil(() =>
+            SceneManager.GetActiveScene().name == "GameplayScene");
+
+        // wait until all spawn points are registered
+        yield return new WaitUntil(() => PlayerSpawnPoint.HasSpawnPoints());
+
+        // extra safety frame
+        yield return null;
+
+        if (!networkManager.ConnectedClients.ContainsKey(clientId))
+            yield break;
+
+        if (networkManager.ConnectedClients[clientId].PlayerObject != null)
+            yield break;
+
+        NetworkObject playerInstance = GameObject.Instantiate(
+            playerPrefab,
+            PlayerSpawnPoint.GetSpawnIndexPos(),
+            Quaternion.identity
+        );
+
+        playerInstance.SpawnAsPlayerObject(clientId);
+
+        Debug.Log($"Spawned Player for Client {clientId}");
     }
 
     private void OnClientDisconnect(ulong clientId)
@@ -55,27 +90,14 @@ public class NetworkServer : IDisposable
         }
     }
 
-    private async Task SpawnPlayerDelayed(ulong clientId)
-    {
-        await Task.Delay(3000);
-
-        var clients = NetworkManager.Singleton.ConnectedClientsList;
-
-        NetworkObject playerInstance = GameObject.Instantiate(playerPrefab, PlayerSpawnPoint.GetSpawnIndexPos(), Quaternion.identity);
-
-        playerInstance.SpawnAsPlayerObject(clientId);
-    }
-
     public UserData GetUserDataByClientId(ulong clientId)
     {
         if (clientIdToAuth.TryGetValue(clientId, out string authId))
         {
             if (authIdToUserData.TryGetValue(authId, out UserData data))
-            {
                 return data;
-            }
-            return null;
         }
+
         return null;
     }
 
@@ -84,12 +106,11 @@ public class NetworkServer : IDisposable
         if (networkManager == null) return;
 
         networkManager.ConnectionApprovalCallback -= ApprovalCheck;
+        networkManager.OnClientConnectedCallback -= OnClientConnected;
         networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
         networkManager.OnServerStarted -= OnNetworkReady;
 
         if (networkManager.IsListening)
-        {
             networkManager.Shutdown();
-        }
     }
 }

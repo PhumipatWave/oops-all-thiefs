@@ -971,10 +971,10 @@ MonoBehaviour:
   TransitionStateInfoList: []
   AnimatorParameterEntries:
     ParameterEntries:
-    - name: vel
-      NameHash: -206340255
+    - name: isMove
+      NameHash: 1308828276
       Synchronize: 1
-      ParameterType: 1
+      ParameterType: 4
   AnimatorParametersExpanded: 0
 --- !u!4 &6744106108185264062 stripped
 Transform:

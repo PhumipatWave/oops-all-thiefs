@@ -1,11 +1,8 @@
 ﻿<Solution>
   <Project Path="Game.Core.csproj" />
-  <Project Path="Game.UI.csproj" />
   <Project Path="Game.Gameplay.csproj" />
+  <Project Path="Game.UI.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
-  <Project Path="Game.Network.csproj" />
-  <Project Path="Game.Application.csproj" />
   <Project Path="Game.Test.csproj" />
-  <Project Path="Game.Utils.csproj" />
 </Solution>

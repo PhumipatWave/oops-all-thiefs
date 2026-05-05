@@ -1,4 +1,6 @@
-﻿using Unity.Cinemachine;
+﻿using System;
+using Unity.Cinemachine;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -12,6 +14,10 @@ public class Player : Character
 
     [Header("Settings")]
     [SerializeField] private int ownerPriority = 15;
+    public NetworkVariable<FixedString32Bytes> PlayerName = new NetworkVariable<FixedString32Bytes>();
+
+    public static event Action<Player> OnPlayerSpawned;
+    public static event Action<Player> OnPlayerDespawned;
 
     public override void OnNetworkSpawn()
     {
@@ -23,10 +29,18 @@ public class Player : Character
 
         attackHitBox.SetActive(false);
 
+        if (IsServer)
+        {
+            UserData userData = HostHandler.Instance.GameManager.NetworkServer.GetUserDataByClientId(OwnerClientId);
+
+            PlayerName.Value = userData != null ? userData.UserName : "Missing name";
+            Debug.Log($"Player name : {PlayerName.Value}");
+            CurrentHealth.Value = MaxHealth;
+        }
+
         if (IsOwner)
         {
             inputReader.OnMoved += Move;
-            //inputReader.OnSprinted += Move;
             inputReader.OnJumped += Jump;
             inputReader.OnInteracted += Interact;
             inputReader.OnAttacked += Attack;
@@ -34,19 +48,18 @@ public class Player : Character
             playerCam.Priority = ownerPriority;
         }
 
-        if (IsServer)
-            CurrentHealth.Value = MaxHealth;
-
+        OnPlayerSpawned?.Invoke(this);
         Debug.Log("Player network spawned");
     }
 
     public override void OnNetworkDespawn()
     {
+        OnPlayerDespawned?.Invoke(this);
+
         if (!IsOwner)
-            return;
-        
+            return; 
+
         inputReader.OnMoved -= Move;
-        //inputReader.OnSprinted -= Move;
         inputReader.OnJumped -= Jump;
         inputReader.OnInteracted -= Interact;
         inputReader.OnAttacked -= Attack;
@@ -57,20 +70,9 @@ public class Player : Character
         Debug.Log($"Owner? {IsOwner} | ClientId: {OwnerClientId}");
     }
 
-    // Test health
     private void Update()
     {
         if (!IsOwner) return;
-
-        /*if (Input.GetKeyDown(KeyCode.E))
-        {
-            Heal(10);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            TakeDamage(25);
-        }*/
 
         GroundCheck();
         UpdateAnimation();
@@ -80,7 +82,6 @@ public class Player : Character
     {
         if (!IsOwner) return;
 
-        //Debug.Log("Player FixedUpdate");
         HandleMove();
         RotatorToCam();
     }

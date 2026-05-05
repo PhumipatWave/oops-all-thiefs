@@ -52,14 +52,11 @@ public class ClientGameManager : IDisposable
         RelayServerData relayServerData = allocation.ToRelayServerData("dtls");
         transport.SetRelayServerData(relayServerData);
 
-        // Team Not Finish *************************************************************************
         UserData userData = new UserData
         {
             UserName = PlayerPrefs.GetString(UserConstKey.GetPlayerNameKey(), "Missing Name"),
             UserAuthId = AuthenticationService.Instance.PlayerId,
-            //teamIndex = PlayerPrefs.GetInt(TeamSelector.PlayerTeamKey, 0)
         };
-        //**********************************************************************************
 
         string payload = JsonUtility.ToJson(userData);
         byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);

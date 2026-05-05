@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.HID;
 
 public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHealthable
 {
