@@ -15,6 +15,7 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     [Header("Network Variable")]
     public NetworkVariable<int> CurrentHealth = new NetworkVariable<int>();
     public NetworkVariable<int> CurrentMoney = new NetworkVariable<int>();
+    public NetworkVariable<bool> IsDead = new NetworkVariable<bool>(false);
 
     public event Action OnDeath;
 
@@ -70,17 +71,16 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     protected void HandleMove()
     {
-        if (isKnockBack) 
-            return;
+        if (IsDead.Value) return;
+        if (isKnockBack) return;
 
         Vector3 moveDir = transform.forward * previousMovementInput.y
             + transform.right * previousMovementInput.x;
+
         rb.linearVelocity = new Vector3(moveDir.x * currentMoveSpeed, rb.linearVelocity.y, moveDir.z * currentMoveSpeed);
 
         float moveValue = new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude;
         anim.SetFloat("velX", moveValue);
-
-        //Debug.Log($"Player move {moveDir}");
     }
 
     protected void UpdateAnimation()
@@ -112,13 +112,11 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     public void Jump()
     {
-        if (isGrounded)
-        {
-            Vector3 velocity = new Vector3(rb.linearVelocity.x, currentJumpForce, rb.linearVelocity.z);
-            rb.linearVelocity = velocity;
+        if (IsDead.Value) return;
+        if (!isGrounded) return;
 
-            Debug.Log($"Player jump");
-        }
+        Vector3 velocity = new Vector3(rb.linearVelocity.x, currentJumpForce, rb.linearVelocity.z);
+        rb.linearVelocity = velocity;
     }
 
     public void Interact()
@@ -131,6 +129,7 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         if (!isGrounded) return;
         if (!hasWeapon.Value) return;
         if (isAttacking) return;
+        if (IsDead.Value) return;
 
         if (Time.time - lastAttackTime < 0.4f) return;
         lastAttackTime = Time.time;
@@ -249,6 +248,88 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     public void Death()
     {
+        if (!IsServer) return;
+        if (IsDead.Value) return;
+
+        IsDead.Value = true;
         OnDeath?.Invoke();
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        StartCoroutine(RespawnRoutine());
+    }
+
+    private IEnumerator RespawnRoutine()
+    {
+        Debug.Log($"Player {OwnerClientId} died. Respawning soon...");
+
+        // freeze player while dead
+        rb.linearVelocity = Vector3.zero;
+
+        yield return new WaitForSeconds(3f);
+
+        int spawnIndex = (int)OwnerClientId;
+        Vector3 respawnPos = PlayerSpawnPoint.Instance.GetSpawnIndexPos(spawnIndex);
+
+        RespawnPlayer(respawnPos);
+    }
+
+    private void RespawnPlayer(Vector3 pos)
+    {
+        CurrentHealth.Value = MaxHealth;
+
+        hasWeapon.Value = false;
+        weaponDurability.Value = 3;
+
+        isKnockBack = false;
+        isAttacking = false;
+
+        previousMovementInput = Vector3.zero;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        rb.position = pos;
+        rb.rotation = Quaternion.identity;
+
+        transform.position = pos;
+        transform.rotation = Quaternion.identity;
+
+        Physics.SyncTransforms();
+
+        ForceRespawnClientRpc(pos);
+
+        StartCoroutine(ReleaseDeadFlag());
+    }
+
+    private IEnumerator ReleaseDeadFlag()
+    {
+        yield return new WaitForSeconds(0.2f);
+        IsDead.Value = false;
+    }
+
+    [ClientRpc]
+    private void ForceRespawnClientRpc(Vector3 pos)
+    {
+        StartCoroutine(ClientRespawnFix(pos));
+    }
+
+    private IEnumerator ClientRespawnFix(Vector3 pos)
+    {
+        yield return null; // wait one frame after rpc arrives
+
+        previousMovementInput = Vector3.zero;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        rb.position = pos;
+        rb.rotation = Quaternion.identity;
+
+        transform.position = pos;
+        transform.rotation = Quaternion.identity;
+
+        Physics.SyncTransforms();
     }
 }

@@ -75,6 +75,7 @@ public class Player : Character
     private void Update()
     {
         if (!IsOwner) return;
+        if (IsDead.Value) return;
 
         GroundCheck();
         UpdateAnimation();
@@ -83,6 +84,7 @@ public class Player : Character
     private void FixedUpdate()
     {
         if (!IsOwner) return;
+        if (IsDead.Value) return;
 
         HandleMove();
         RotatorToCam();
@@ -105,9 +107,15 @@ public class Player : Character
                 Debug.Log("Player hit by another player's attack");
                 Vector3 knockbackDir = (transform.position - other.transform.position).normalized;
 
-                TakeDamage(10, knockbackDir);
+                RequestTakeDamageServerRpc(10, knockbackDir);
             }
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestTakeDamageServerRpc(int amount, Vector3 dir)
+    {
+        TakeDamage(amount, dir);
     }
 
     [ServerRpc]
