@@ -93,27 +93,7 @@ public class Player : Character
 
         if (other.TryGetComponent(out Item item))
         {
-            if (item.ItemStat is ValueItemBaseStat valueItem)
-            {
-                item.CollectValueItemServerRpc();
-                AddMoneyServerRpc(valueItem.MoneyValue);
-            }
-            else if (item.ItemStat is WeaponItemBaseStat weaponItem && !isEquipeWeapon)
-            {
-                int weaponIndex = weaponRegistry.GetIndex(weaponItem.WeaponPrefab);
-                if (weaponIndex < 0)
-                {
-                    Debug.LogError("Weapon not found in WeaponRegistry!");
-                    return;
-                }
-
-                isEquipeWeapon = true;
-
-                item.CollectWeaponItemServerRpc();
-
-                // Tell server → broadcast to ALL clients to spawn weapon locally
-                EquipWeaponServerRpc(weaponIndex);
-            }
+            RequestPickupServerRpc(item.NetworkObject);
         }
 
         if (other.CompareTag("HitBox"))
@@ -131,14 +111,47 @@ public class Player : Character
     }
 
     [ServerRpc]
+    private void RequestPickupServerRpc(NetworkObjectReference itemRef)
+    {
+        if (!itemRef.TryGet(out NetworkObject obj)) return;
+        if (!obj.TryGetComponent(out Item item)) return;
+
+        // MONEY ITEM
+        if (item.ItemStat is ValueItemBaseStat valueItem)
+        {
+            CurrentMoney.Value += valueItem.MoneyValue;
+
+            item.CollectValueItemServerRpc(); // hide / destroy item
+            return;
+        }
+
+        // WEAPON ITEM
+        if (item.ItemStat is WeaponItemBaseStat weaponItem)
+        {
+            if (hasWeapon.Value) return;
+
+            hasWeapon.Value = true;
+
+            int index = weaponRegistry.GetIndex(weaponItem.WeaponPrefab);
+
+            item.CollectWeaponItemServerRpc();
+            EquipWeaponClientRpc(index);
+        }
+    }
+
+    [ServerRpc]
     private void AddMoneyServerRpc(int amount)
     {
         CurrentMoney.Value += amount;
     }
 
     [ServerRpc]
-    private void EquipWeaponServerRpc(int weaponIndex)
+    private void EquipWeaponServerRpc(int weaponIndex, ServerRpcParams rpcParams = default)
     {
+        if (hasWeapon.Value) return; 
+
+        hasWeapon.Value = true;
+
         EquipWeaponClientRpc(weaponIndex);
     }
 

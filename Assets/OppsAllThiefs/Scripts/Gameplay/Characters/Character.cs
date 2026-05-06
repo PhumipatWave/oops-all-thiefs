@@ -30,11 +30,15 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     [SerializeField] protected float groundDistance = 0.4f;
     [SerializeField] protected LayerMask groundLayer;
 
-    protected bool isEquipeWeapon;
+    public NetworkVariable<int> weaponDurability = new(3);
+    public NetworkVariable<bool> hasWeapon = new(false);
     [SerializeField] protected Transform weaponHoldPoint;
 
     [SerializeField] protected GameObject equippedWeapon;
     //[SerializeField] protected WeaponItemBaseStat equippedWeaponStat;
+
+    protected bool isAttacking;
+    private float lastAttackTime;
 
     [SerializeField] protected GameObject attackHitBox;
 
@@ -119,11 +123,54 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     public void Attack()
     {
-        if (isGrounded && isEquipeWeapon)
+        if (!isGrounded) return;
+        if (!hasWeapon.Value) return;
+        if (isAttacking) return;
+
+        if (Time.time - lastAttackTime < 0.4f) return;
+        lastAttackTime = Time.time;
+
+        isAttacking = true;
+
+        anim.SetTrigger("isAttack");
+
+        EnableAttackHitBoxServerRpc();
+        ReduceWeaponDurabilityServerRpc();
+
+        StartCoroutine(ResetAttack());
+    }
+
+    private IEnumerator ResetAttack()
+    {
+        yield return new WaitForSeconds(0.5f);
+        isAttacking = false;
+    }
+
+    [ServerRpc]
+    private void ReduceWeaponDurabilityServerRpc()
+    {
+        weaponDurability.Value--;
+
+        if (weaponDurability.Value <= 0)
         {
-            Debug.Log("Player attack");
-            anim.SetTrigger("isAttack");
-            EnableAttackHitBoxServerRpc();
+            RemoveWeapon();
+        }
+    }
+
+    private void RemoveWeapon()
+    {
+        hasWeapon.Value = false;
+        weaponDurability.Value = 0;
+        DestroyWeaponClientRpc();
+    }
+
+    [ClientRpc]
+    private void DestroyWeaponClientRpc()
+    {
+        if (equippedWeapon != null)
+        {
+            Destroy(equippedWeapon);
+            equippedWeapon = null;
         }
     }
 

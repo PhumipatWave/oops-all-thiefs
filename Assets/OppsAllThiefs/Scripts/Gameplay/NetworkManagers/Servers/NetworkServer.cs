@@ -14,6 +14,11 @@ public class NetworkServer : IDisposable
     private Dictionary<ulong, string> clientIdToAuth = new();
     private Dictionary<string, UserData> authIdToUserData = new();
 
+    private Dictionary<ulong, int> clientSpawnIndex = new();
+    private int nextSpawnIndex = 0;
+
+    private bool sceneReady = false;
+
     public NetworkServer(NetworkManager networkManager, NetworkObject playerPrefab)
     {
         this.networkManager = networkManager;
@@ -44,40 +49,78 @@ public class NetworkServer : IDisposable
         networkManager.OnClientDisconnectCallback += OnClientDisconnect;
 
         networkManager.OnServerStarted -= OnNetworkReady;
+
+        // detect scene load via Unity (simple + reliable)
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "GameplayScene")
+        {
+            sceneReady = true;
+
+            Debug.Log("GameplayScene READY → spawning all clients");
+
+            SpawnAllClients();
+        }
     }
 
     private void OnClientConnected(ulong clientId)
     {
-        HostHandler.Instance.StartCoroutine(SpawnWhenReady(clientId));
+        if (!clientSpawnIndex.ContainsKey(clientId))
+        {
+            clientSpawnIndex[clientId] = nextSpawnIndex;
+            nextSpawnIndex++;
+        }
+
+        Debug.Log($"Client {clientId} assigned spawn index {clientSpawnIndex[clientId]}");
+
+        // if scene already loaded → spawn immediately
+        if (sceneReady)
+        {
+            SpawnClient(clientId);
+        }
     }
 
-    private System.Collections.IEnumerator SpawnWhenReady(ulong clientId)
+    private void SpawnAllClients()
     {
-        // wait until gameplay scene is actually active
-        yield return new WaitUntil(() =>
-            SceneManager.GetActiveScene().name == "GameplayScene");
+        foreach (var client in networkManager.ConnectedClientsIds)
+        {
+            SpawnClient(client);
+        }
+    }
 
-        // wait until all spawn points are registered
-        yield return new WaitUntil(() => PlayerSpawnPoint.HasSpawnPoints());
-
-        // extra safety frame
-        yield return null;
+    private void SpawnClient(ulong clientId)
+    {
+        if (!networkManager.IsServer)
+            return;
 
         if (!networkManager.ConnectedClients.ContainsKey(clientId))
-            yield break;
+            return;
 
         if (networkManager.ConnectedClients[clientId].PlayerObject != null)
-            yield break;
+            return;
 
-        NetworkObject playerInstance = GameObject.Instantiate(
+        if (PlayerSpawnPoint.Instance == null || !PlayerSpawnPoint.Instance.HasSpawnPoints())
+        {
+            Debug.LogError("Spawn points not ready");
+            return;
+        }
+
+        int index = clientSpawnIndex[clientId];
+
+        Vector3 pos = PlayerSpawnPoint.Instance.GetSpawnIndexPos(index);
+
+        NetworkObject player = GameObject.Instantiate(
             playerPrefab,
-            PlayerSpawnPoint.GetSpawnIndexPos(),
+            pos,
             Quaternion.identity
         );
 
-        playerInstance.SpawnAsPlayerObject(clientId);
+        player.SpawnAsPlayerObject(clientId);
 
-        Debug.Log($"Spawned Player for Client {clientId}");
+        Debug.Log($"Spawned client {clientId} at index {index} pos {pos}");
     }
 
     private void OnClientDisconnect(ulong clientId)
@@ -86,6 +129,8 @@ public class NetworkServer : IDisposable
         {
             clientIdToAuth.Remove(clientId);
             authIdToUserData.Remove(authId);
+            clientSpawnIndex.Remove(clientId);
+
             OnClientLeft?.Invoke(authId);
         }
     }
@@ -108,7 +153,8 @@ public class NetworkServer : IDisposable
         networkManager.ConnectionApprovalCallback -= ApprovalCheck;
         networkManager.OnClientConnectedCallback -= OnClientConnected;
         networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
-        networkManager.OnServerStarted -= OnNetworkReady;
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
 
         if (networkManager.IsListening)
             networkManager.Shutdown();

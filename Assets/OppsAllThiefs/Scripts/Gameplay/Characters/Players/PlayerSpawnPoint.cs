@@ -1,33 +1,29 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerSpawnPoint : MonoBehaviour
 {
-    private static List<PlayerSpawnPoint> spawnPoints = new();
+    [SerializeField] private Transform[] spawnPoints;
 
-    private void OnEnable()
+    public static PlayerSpawnPoint Instance;
+
+    private void Awake()
     {
-        spawnPoints.Add(this);
+        Instance = this;
     }
 
-    private void OnDisable()
+    public Vector3 GetSpawnIndexPos(int index)
     {
-        spawnPoints.Remove(this);
-    }
-
-    public static Vector3 GetSpawnIndexPos()
-    {
-        if (spawnPoints.Count == 0)
-        {
+        if (spawnPoints == null || spawnPoints.Length == 0)
             return Vector3.zero;
-        }
 
-        int index = Random.Range(0, spawnPoints.Count);
-        return spawnPoints[index].transform.position;
+        if (index >= spawnPoints.Length)
+            index = index % spawnPoints.Length;
+
+        return spawnPoints[index].position;
     }
 
-    public static bool HasSpawnPoints()
+    public bool HasSpawnPoints()
     {
-        return spawnPoints.Count > 0;
+        return spawnPoints != null && spawnPoints.Length > 0;
     }
 }

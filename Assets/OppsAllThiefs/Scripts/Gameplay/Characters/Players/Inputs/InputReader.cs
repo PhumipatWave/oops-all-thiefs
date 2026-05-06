@@ -32,30 +32,32 @@ public class InputReader : ScriptableObject, IPlayerActions
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        Debug.Log("Move Input");
+        //Debug.Log("Move Input");
         OnMoved?.Invoke(context.ReadValue<Vector2>());
     }
+
+    // Not use
     public void OnSprint(InputAction.CallbackContext context)
     {
-        Debug.Log("Sprint Input");
+        //Debug.Log("Sprint Input");
         OnSprinted?.Invoke(context.ReadValue<Vector2>());
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        Debug.Log("Jump Input");
+        //Debug.Log("Jump Input");
         OnJumped?.Invoke();
     }
 
     public void OnInteract(InputAction.CallbackContext context)
     {
-        Debug.Log("Interact Input");
+        //Debug.Log("Interact Input");
         OnInteracted?.Invoke();
     }
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        Debug.Log("Attack Input");
+        //Debug.Log("Attack Input");
         OnAttacked?.Invoke();
     }
 }
