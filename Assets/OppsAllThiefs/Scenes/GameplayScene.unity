@@ -684,13 +684,14 @@ MonoBehaviour:
   - {fileID: 8581291131388977496, guid: 17c54ebc45a957c46b99e3bf6b33c332, type: 3}
   - {fileID: 5713386212654640001, guid: 8b9d040dac93883478e9286d6ca2e130, type: 3}
   - {fileID: 9083935527424477353, guid: 933435ce5d5493241b2008583053aa98, type: 3}
-  maxItems: 12
+  maxItems: 25
   xRange: {x: -75, y: 75}
   zRange: {x: -75, y: 75}
   obstacleMask:
     serializedVersion: 2
     m_Bits: 256
   checkRadius: 2.25
+  respawnDelay: 3
 --- !u!1 &340636703
 GameObject:
   m_ObjectHideFlags: 0
@@ -788,6 +789,36 @@ Transform:
   - {fileID: 1286971321}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &356251089 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2481164997365400550, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
+  m_PrefabInstance: {fileID: 7131973496064308865}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &356251092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356251089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 3960377053
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 0
+  AllowOwnerToParent: 0
 --- !u!1001 &387670481
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -897,6 +928,52 @@ MonoBehaviour:
   - {fileID: 239539762}
   speed: 8
   waitTime: 3
+--- !u!1 &390612983
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 390612985}
+  - component: {fileID: 390612984}
+  m_Layer: 0
+  m_Name: CursorManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &390612984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390612983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da8d3acf28b956d468212f62ae37f1c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Gameplay::CursorManager
+  visibleCursor: 0
+  cursorMode: 1
+--- !u!4 &390612985
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390612983}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -10.66907, y: 0, z: 28.17689}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &397136336
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4570,6 +4647,10 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 3872463665
       objectReference: {fileID: 0}
+    - target: {fileID: 3021176731761170926, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
+      propertyPath: matchDuration
+      value: 480
+      objectReference: {fileID: 0}
     - target: {fileID: 7025864268218791012, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -4637,7 +4718,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2481164997365400550, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 356251092}
   m_SourcePrefab: {fileID: 100100000, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
 --- !u!1001 &7186629950000896345
 PrefabInstance:
@@ -6436,3 +6520,4 @@ SceneRoots:
   - {fileID: 340636705}
   - {fileID: 831097657}
   - {fileID: 305033916}
+  - {fileID: 390612985}

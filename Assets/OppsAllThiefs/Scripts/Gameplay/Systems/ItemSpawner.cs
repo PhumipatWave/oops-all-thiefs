@@ -1,4 +1,3 @@
-using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -12,6 +11,8 @@ public class ItemSpawner : NetworkBehaviour
 
     [SerializeField] private LayerMask obstacleMask;
     [SerializeField] private float checkRadius = 1f;
+
+    [SerializeField] private float respawnDelay = 3f;
 
     public override void OnNetworkSpawn()
     {
@@ -31,19 +32,17 @@ public class ItemSpawner : NetworkBehaviour
         Item item = Instantiate(prefab, pos, Quaternion.identity);
         item.NetworkObject.Spawn();
 
-        item.OnCollected += HandleCollected;
+        item.Initialize(this);
     }
 
-    private void HandleCollected(Item item)
+    public Vector3 GetNewRespawnPoint()
     {
-        Vector3 newPos = GetSpawnPoint();
-        StartCoroutine(RespawnRoutine(item, newPos));
+        return GetSpawnPoint();
     }
 
-    private IEnumerator RespawnRoutine(Item item, Vector3 pos)
+    public float GetRespawnDelay()
     {
-        yield return new WaitForSeconds(0.1f);
-        item.ResetItem(pos);
+        return respawnDelay;
     }
 
     private Item GetRandomPrefab()

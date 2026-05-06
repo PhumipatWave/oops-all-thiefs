@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,10 +10,15 @@ public class Item : NetworkBehaviour
 
     [SerializeField] private Transform itemModel;
 
-    public event Action<Item> OnCollected;
-
     [SerializeField] private int currentItemValue;
     public bool alreadyCollected;
+
+    private ItemSpawner spawner;
+
+    public void Initialize(ItemSpawner itemSpawner)
+    {
+        spawner = itemSpawner;
+    }
 
     public override void OnNetworkSpawn()
     {
@@ -43,9 +49,22 @@ public class Item : NetworkBehaviour
 
         alreadyCollected = true;
 
-        OnCollected?.Invoke(this);
-
         HideClientRpc();
+
+        StartCoroutine(RespawnRoutine());
+    }
+
+    private IEnumerator RespawnRoutine()
+    {
+        yield return new WaitForSeconds(spawner.GetRespawnDelay());
+
+        Vector3 newPos = spawner.GetNewRespawnPoint();
+
+        transform.position = newPos;
+
+        alreadyCollected = false;
+
+        ShowClientRpc();
     }
 
     [ClientRpc]
@@ -64,15 +83,6 @@ public class Item : NetworkBehaviour
     {
         if (itemModel != null)
             itemModel.gameObject.SetActive(state);
-    }
-
-    public void ResetItem(Vector3 newPos)
-    {
-        alreadyCollected = false;
-
-        transform.position = newPos;
-
-        ShowClientRpc();
     }
 
     public void SetValue(int value)
