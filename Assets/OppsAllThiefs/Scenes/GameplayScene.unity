@@ -4398,6 +4398,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameHUD
       objectReference: {fileID: 0}
+    - target: {fileID: 7498717227913541588, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7498717227913541588, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 3d9b791a008beb74483f583fbb9d4660, type: 3}
     - target: {fileID: 7658290171470493352, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -4457,6 +4465,22 @@ PrefabInstance:
     - target: {fileID: 8443147430247151616, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8519691896584207668, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
+      propertyPath: m_fontColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8519691896584207668, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
+      propertyPath: m_fontColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8519691896584207668, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
+      propertyPath: m_fontColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8519691896584207668, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294967295
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7658290171470493352, guid: 900cebae0b7707e4d90d9dfe85472ca7, type: 3}
