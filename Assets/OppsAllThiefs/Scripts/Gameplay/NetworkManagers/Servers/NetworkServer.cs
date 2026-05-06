@@ -50,7 +50,7 @@ public class NetworkServer : IDisposable
 
         networkManager.OnServerStarted -= OnNetworkReady;
 
-        // detect scene load via Unity (simple + reliable)
+        // detect scene load via Unity
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -76,7 +76,7 @@ public class NetworkServer : IDisposable
 
         Debug.Log($"Client {clientId} assigned spawn index {clientSpawnIndex[clientId]}");
 
-        // if scene already loaded → spawn immediately
+        // if scene already loaded => spawn immediately
         if (sceneReady)
         {
             SpawnClient(clientId);

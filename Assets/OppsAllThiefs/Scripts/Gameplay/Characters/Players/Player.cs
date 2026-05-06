@@ -33,6 +33,7 @@ public class Player : Character
         {
             UserData userData = HostHandler.Instance.GameManager.NetworkServer.GetUserDataByClientId(OwnerClientId);
 
+            // Set player name on network spawn.
             PlayerName.Value = userData != null ? userData.UserName : "Missing name";
             Debug.Log($"Player name : {PlayerName.Value}");
             CurrentHealth.Value = MaxHealth;
@@ -40,6 +41,7 @@ public class Player : Character
 
         if (IsOwner)
         {
+            // Mapping input to owner player.
             inputReader.OnMoved += Move;
             inputReader.OnJumped += Jump;
             inputReader.OnInteracted += Interact;
@@ -98,8 +100,6 @@ public class Player : Character
 
         if (other.CompareTag("HitBox"))
         {
-            // Make sure we don't hit ourselves
-            // Check the hitbox doesn't belong to this player
             if (other.transform.root != transform)
             {
                 Debug.Log("Player hit by another player's attack");
@@ -116,16 +116,14 @@ public class Player : Character
         if (!itemRef.TryGet(out NetworkObject obj)) return;
         if (!obj.TryGetComponent(out Item item)) return;
 
-        // MONEY ITEM
         if (item.ItemStat is ValueItemBaseStat valueItem)
         {
             CurrentMoney.Value += valueItem.MoneyValue;
 
-            item.CollectValueItemServerRpc(); // hide / destroy item
+            item.CollectValueItemServerRpc();
             return;
         }
 
-        // WEAPON ITEM
         if (item.ItemStat is WeaponItemBaseStat weaponItem)
         {
             if (hasWeapon.Value) return;
@@ -139,22 +137,6 @@ public class Player : Character
         }
     }
 
-    [ServerRpc]
-    private void AddMoneyServerRpc(int amount)
-    {
-        CurrentMoney.Value += amount;
-    }
-
-    [ServerRpc]
-    private void EquipWeaponServerRpc(int weaponIndex, ServerRpcParams rpcParams = default)
-    {
-        if (hasWeapon.Value) return; 
-
-        hasWeapon.Value = true;
-
-        EquipWeaponClientRpc(weaponIndex);
-    }
-
     [ClientRpc]
     private void EquipWeaponClientRpc(int weaponIndex)
     {
@@ -165,11 +147,9 @@ public class Player : Character
             return;
         }
 
-        // Destroy old weapon if any
         if (equippedWeapon != null)
             Destroy(equippedWeapon);
 
-        // Spawn directly under weaponHoldPoint (your hand bone Transform)
         equippedWeapon = Instantiate(prefab, weaponHoldPoint);
         equippedWeapon.transform.localPosition = Vector3.zero;
         equippedWeapon.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);

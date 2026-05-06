@@ -19,7 +19,7 @@ public class MatchUI : MonoBehaviour
         int min = Mathf.FloorToInt(time / 60);
         int sec = Mathf.FloorToInt(time % 60);
 
-        timerText.text = $"{min:00}:{sec:00}";
+        timerText.text = $"Match Time : {min:00}:{sec:00}";
 
         if (matchManager.matchEnded.Value)
         {

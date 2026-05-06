@@ -1,4 +1,5 @@
 using Unity.Netcode;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -35,6 +36,18 @@ public class Leaderboard : NetworkBehaviour
         if (IsServer)
         {
             StartCoroutine(DelayFindPlayer());
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsClient)
+            leaderboardStates.OnListChanged -= HandleLeaderboardChanged;
+
+        if (IsServer)
+        {
+            Player.OnPlayerSpawned -= AvailableLeaderboard;
+            Player.OnPlayerDespawned -= UnavailableLeaderboard;
         }
     }
 
@@ -94,7 +107,7 @@ public class Leaderboard : NetworkBehaviour
         }
     }
 
-    private System.Collections.IEnumerator DelayFindPlayer()
+    private IEnumerator DelayFindPlayer()
     {
         yield return new WaitUntil(() =>
         NetworkManager.Singleton.IsListening &&
@@ -110,18 +123,6 @@ public class Leaderboard : NetworkBehaviour
 
         Player.OnPlayerSpawned += AvailableLeaderboard;
         Player.OnPlayerDespawned += UnavailableLeaderboard;
-    }
-
-    public override void OnNetworkDespawn()
-    {
-        if (IsClient)
-            leaderboardStates.OnListChanged -= HandleLeaderboardChanged;
-
-        if (IsServer)
-        {
-            Player.OnPlayerSpawned -= AvailableLeaderboard;
-            Player.OnPlayerDespawned -= UnavailableLeaderboard;
-        }
     }
 
     private void HandleLeaderboardChanged(NetworkListEvent<LeaderboardState> changeEvent)

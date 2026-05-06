@@ -5,15 +5,14 @@ using UnityEngine;
 
 public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHealthable
 {
-    [Header("Character Status")]
+    [Header("Component Reference")]
     [SerializeField] protected CharacterBaseStat charStat;
     protected CharacterStatHandle characterStatHandle;
 
     [SerializeField] protected Rigidbody rb;
     [SerializeField] protected Animator anim;
 
-    protected Vector3 previousMovementInput;
-
+    [Header("Network Variable")]
     public NetworkVariable<int> CurrentHealth = new NetworkVariable<int>();
     public NetworkVariable<int> CurrentMoney = new NetworkVariable<int>();
 
@@ -25,28 +24,34 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
     protected int currentJumpForce => charStat.JumpForce;
     protected int currentRotateSpeed => charStat.MaxRotateSpeed;
 
+    protected Vector3 previousMovementInput;
+
+
+    [Header("Ground Check Reference")]
     [SerializeField] protected Transform groundRayPoint;
     [SerializeField] protected bool isGrounded;
     [SerializeField] protected float groundDistance = 0.4f;
     [SerializeField] protected LayerMask groundLayer;
 
+    [Header("Combat Reference")]
     public NetworkVariable<int> weaponDurability = new(3);
     public NetworkVariable<bool> hasWeapon = new(false);
     [SerializeField] protected Transform weaponHoldPoint;
-
     [SerializeField] protected GameObject equippedWeapon;
-    //[SerializeField] protected WeaponItemBaseStat equippedWeaponStat;
+    [SerializeField] protected GameObject attackHitBox;
 
     protected bool isAttacking;
     private float lastAttackTime;
-
-    [SerializeField] protected GameObject attackHitBox;
 
     protected bool isKnockBack;
     [SerializeField] protected float knockBackPower = 50.5f;
     [SerializeField] protected float knockBackUpPower = 25f;
     [SerializeField] protected float knockBackDuration = 0.8f;
 
+
+    /// <OnDrawGizmos>
+    /// Draw gizmos to check ground lenght.
+    /// </OnDrawGizmos>
     protected virtual void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
@@ -84,9 +89,9 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         anim.SetBool("isJumping", !isGrounded);
     }
 
-    /// <summary>
+    /// <MoveRotator>
     /// Rotate the player to the movement direction.
-    /// </summary>
+    /// </MoveRotator>
     public void MoveRotator()
     {
         Vector3 moveDir = transform.forward * previousMovementInput.y
@@ -188,7 +193,7 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         StartCoroutine(DisableHitBoxAfterDelay(0.3f));
     }
 
-    private System.Collections.IEnumerator DisableHitBoxAfterDelay(float delay)
+    private IEnumerator DisableHitBoxAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         attackHitBox.SetActive(false);
@@ -196,20 +201,15 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     public void Heal(int amount)
     {
-        //CurrentHealth.Value = characterStatHandle.ModifyStat(CurrentHealth.Value, charStat.MaxHealth, amount);
-
         ModifyStatServerRpc(amount);
     }
 
     public void TakeDamage(int amount, Vector3 dir)
     {
-        //CurrentHealth.Value = characterStatHandle.ModifyStat(CurrentHealth.Value, charStat.MaxHealth, -amount);
-
         ModifyStatServerRpc(-amount);
         KnockbackServerRpc(dir);
     }
 
-    // Test Modify
     [ServerRpc(RequireOwnership = false)]
     public void ModifyStatServerRpc(int amount)
     {

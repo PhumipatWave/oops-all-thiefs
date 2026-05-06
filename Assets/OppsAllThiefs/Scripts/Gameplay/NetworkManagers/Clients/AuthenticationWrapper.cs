@@ -17,15 +17,9 @@ public class AuthenticationWrapper
 {
     public static AuthState AuthState { get; private set; } = AuthState.NotAuthenticated;
 
-    /// <summary>
+    /// <DoAuth>
     /// Initiates the authentication process and returns the current authentication state.
-    /// </summary>
-    /// <param name="maxRetries">
-    /// The maximum number of retry to sign-in as anonymous.
-    /// </param>
-    /// <returns>
-    /// Current authentication state
-    /// </returns>
+    /// </DoAuth>
     public static async Task<AuthState> DoAuth(int maxRetries = 5)
     {
         if (AuthState == AuthState.Authenticated)

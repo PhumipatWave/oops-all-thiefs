@@ -23,7 +23,7 @@ public class HostGameManager : IDisposable
     public string JoinCode {  get; private set; }
     public NetworkServer NetworkServer { get; private set; }
 
-    private const int MaxConnections = 7;
+    private const int MaxConnections = 8;
     private const string GameSceneName = "GameplayScene";
     private const string JoinCodeKey = "JoinCode";
 
@@ -128,10 +128,9 @@ public class HostGameManager : IDisposable
         NetworkManager.Singleton.StartHost();
     }
 
-    /// <summary>
-    /// Sends periodic heartbeat pings to the lobby service to keep the lobby active.
-    /// </summary>
-    /// <param name="waitTimeSeconds">The interval, in seconds, to wait between each heartbeat ping.</param>
+    /// <HeartbeatLobby>
+    /// Sends heartbeat to the lobby service to keep the lobby active.
+    /// </HeartbeatLobby>
     private IEnumerator HeartbeatLobby(float waitTimeSeconds)
     {
         WaitForSecondsRealtime delay = new WaitForSecondsRealtime(waitTimeSeconds);
@@ -177,9 +176,6 @@ public class HostGameManager : IDisposable
         NetworkServer?.Dispose();
     }
 
-    /// <summary>
-    /// Unsubscribe all events in NetworkServer
-    /// </summary>
     public async void Dispose()
     {
         Shutdown();
