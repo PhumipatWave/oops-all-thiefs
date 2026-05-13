@@ -110,6 +110,8 @@ public class Player : Character
                 RequestTakeDamageServerRpc(10, knockbackDir);
             }
         }
+
+        AudioManager.Instance.PlaySfx(0);
     }
 
     [ServerRpc(RequireOwnership = false)]

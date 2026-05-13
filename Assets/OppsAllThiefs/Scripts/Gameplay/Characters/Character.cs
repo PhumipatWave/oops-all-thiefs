@@ -135,6 +135,7 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
         lastAttackTime = Time.time;
 
         isAttacking = true;
+        AudioManager.Instance.PlaySfx(2);
 
         anim.SetTrigger("isAttack");
 
@@ -205,6 +206,7 @@ public abstract class Character : NetworkBehaviour, IMoveable, IAttackable, IHea
 
     public void TakeDamage(int amount, Vector3 dir)
     {
+        AudioManager.Instance.PlaySfx(1);
         ModifyStatServerRpc(-amount);
         KnockbackServerRpc(dir);
     }
