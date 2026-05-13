@@ -1,16 +1,13 @@
+using System;
 using UnityEngine;
 
-public class GameplayEvents : MonoBehaviour
+public static class GameplayEvents
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    // Declare events
+    public static event Action OnGameStarted;
+    public static event Action OnGameFinished;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // Use for Invoke the events
+    public static void RaiseGameStarted() => OnGameStarted?.Invoke();
+    public static void RaiseGameFinished() => OnGameFinished?.Invoke();
 }

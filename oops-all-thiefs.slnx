@@ -1,8 +1,8 @@
 ﻿<Solution>
-  <Project Path="OppAllThiefs.Core.csproj" />
-  <Project Path="OppAllThiefs.Gameplay.csproj" />
+  <Project Path="Game.Core.csproj" />
+  <Project Path="Game.Gameplay.csproj" />
+  <Project Path="Game.UI.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
-  <Project Path="OppAllThiefs.UI.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
-  <Project Path="OppAllThiefs.Multiplayer.csproj" />
+  <Project Path="Game.Test.csproj" />
 </Solution>
